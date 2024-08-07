@@ -62,7 +62,9 @@ async def rules(interaction: discord.Interaction):
 
 @bot.command()
 async def version(ctx: commands.Context):
-    await ctx.send(content=f"*Version {config.version}*")
+    await ctx.send(
+        content=f"*Version {config.version}*\n*Source code: {config.source_code_link}*"
+    )
 
 
 bot.run(config.discord_token)
