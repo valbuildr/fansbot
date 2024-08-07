@@ -1,7 +1,7 @@
 import discord
 import discord.ext.commands as commands
 import config
-import database
+from models.moderation import ModerationMute
 from datetime import datetime, timedelta
 import peewee
 from zoneinfo import ZoneInfo
@@ -57,7 +57,7 @@ async def add_mute(
         a = datetime.now(ZoneInfo("Europe/London"))
         b = a + timedelta(seconds=time)
 
-        database.ModerationMute.create(
+        ModerationMute.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -117,9 +117,9 @@ async def mutes(
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
-                database.ModerationMute.select()
-                .where(database.ModerationMute.user_id == user.id)
-                .where(database.ModerationMute.rule == rule)[:25]
+                ModerationMute.select()
+                .where(ModerationMute.user_id == user.id)
+                .where(ModerationMute.rule == rule)[:25]
             )
 
             e = discord.Embed(title=f"Mutes for {user.name}")
@@ -139,8 +139,8 @@ async def mutes(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = database.ModerationMute.select().where(
-                database.ModerationMute.user_id == user.id
+            q = ModerationMute.select().where(
+                ModerationMute.user_id == user.id
             )[:25]
 
             e = discord.Embed(title=f"Mutes for {user.name}")
@@ -175,7 +175,7 @@ async def mute_info(interaction: discord.Interaction, mute_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            q = database.ModerationMute.get_by_id(mute_id)
+            q = ModerationMute.get_by_id(mute_id)
 
             e = discord.Embed(title=f"Mute {mute_id}")
 
@@ -224,7 +224,7 @@ async def remove_mute(interaction: discord.Interaction, mute_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            a = database.ModerationMute.get_by_id(mute_id)
+            a = ModerationMute.get_by_id(mute_id)
 
             a.delete_instance()
 

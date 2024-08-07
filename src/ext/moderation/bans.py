@@ -1,7 +1,7 @@
 import discord
 import discord.ext.commands as commands
 import config
-import database
+from models.moderation import ModerationBan
 from datetime import datetime
 import peewee
 
@@ -25,7 +25,7 @@ async def add_ban(
         config.mod_role_id
     )
     if mod_role in interaction.user.roles:
-        database.ModerationBan.create(
+        ModerationBan.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -81,9 +81,9 @@ async def bans(
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
-                database.ModerationBan.select()
-                .where(database.ModerationBan.user_id == user.id)
-                .where(database.ModerationBan.rule == rule)[:25]
+                ModerationBan.select()
+                .where(ModerationBan.user_id == user.id)
+                .where(ModerationBan.rule == rule)[:25]
             )
 
             e = discord.Embed(title=f"Bans for {user.name}")
@@ -103,8 +103,8 @@ async def bans(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = database.ModerationBan.select().where(
-                database.ModerationBan.user_id == user.id
+            q = ModerationBan.select().where(
+                ModerationBan.user_id == user.id
             )[:25]
 
             e = discord.Embed(title=f"Bans for {user.name}")
@@ -139,7 +139,7 @@ async def ban_info(interaction: discord.Interaction, ban_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            q = database.ModerationBan.get_by_id(ban_id)
+            q = ModerationBan.get_by_id(ban_id)
 
             e = discord.Embed(title=f"Warning {ban_id}")
 
@@ -188,7 +188,7 @@ async def remove_ban(interaction: discord.Interaction, ban_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            a = database.ModerationBan.get_by_id(ban_id)
+            a = ModerationBan.get_by_id(ban_id)
 
             a.delete_instance()
 

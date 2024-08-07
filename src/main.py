@@ -2,9 +2,14 @@ import discord
 import os
 import config
 from discord.ext import commands
+from models.moderation import (
+    ModerationNote,
+    ModerationWarning,
+    ModerationMute,
+    ModerationKick,
+    ModerationBan,
+)
 import database
-from datetime import datetime
-import peewee
 from ext.moderation import bans, kicks, mutes, notes, warnings
 
 bot = commands.Bot(command_prefix="*", intents=discord.Intents.all())
@@ -19,11 +24,11 @@ async def on_ready():
     print(f"Logged in as {bot.user.name}")
     database.db.create_tables(
         [
-            database.ModerationNote,
-            database.ModerationWarning,
-            database.ModerationMute,
-            database.ModerationKick,
-            database.ModerationBan,
+            ModerationNote,
+            ModerationWarning,
+            ModerationMute,
+            ModerationKick,
+            ModerationBan,
         ]
     )
 

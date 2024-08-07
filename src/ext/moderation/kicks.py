@@ -1,7 +1,7 @@
 import discord
 import discord.ext.commands as commands
 import config
-import database
+from models.moderation import ModerationKick
 from datetime import datetime
 import peewee
 
@@ -25,7 +25,7 @@ async def add_kick(
         config.mod_role_id
     )
     if mod_role in interaction.user.roles:
-        database.ModerationKick.create(
+        ModerationKick.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -81,9 +81,9 @@ async def kicks(
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
-                database.ModerationKick.select()
-                .where(database.ModerationKick.user_id == user.id)
-                .where(database.ModerationKick.rule == rule)[:25]
+                ModerationKick.select()
+                .where(ModerationKick.user_id == user.id)
+                .where(ModerationKick.rule == rule)[:25]
             )
 
             e = discord.Embed(title=f"Kicks for {user.name}")
@@ -103,8 +103,8 @@ async def kicks(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = database.ModerationKick.select().where(
-                database.ModerationKick.user_id == user.id
+            q = ModerationKick.select().where(
+                ModerationKick.user_id == user.id
             )[:25]
 
             e = discord.Embed(title=f"Kicks for {user.name}")
@@ -139,7 +139,7 @@ async def kick_info(interaction: discord.Interaction, kick_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            q = database.ModerationKick.get_by_id(kick_id)
+            q = ModerationKick.get_by_id(kick_id)
 
             e = discord.Embed(title=f"Warning {kick_id}")
 
@@ -188,7 +188,7 @@ async def remove_kick(interaction: discord.Interaction, kick_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            a = database.ModerationKick.get_by_id(kick_id)
+            a = ModerationKick.get_by_id(kick_id)
 
             a.delete_instance()
 

@@ -1,7 +1,7 @@
 import discord
 import discord.ext.commands as commands
 import config
-import database
+from models.moderation import ModerationWarning
 from datetime import datetime
 import peewee
 
@@ -25,7 +25,7 @@ async def add_warning(
         config.mod_role_id
     )
     if mod_role in interaction.user.roles:
-        database.ModerationWarning.create(
+        ModerationWarning.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -79,9 +79,9 @@ async def warnings(
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
-                database.ModerationWarning.select()
-                .where(database.ModerationWarning.user_id == user.id)
-                .where(database.ModerationWarning.rule == rule)[:25]
+                ModerationWarning.select()
+                .where(ModerationWarning.user_id == user.id)
+                .where(ModerationWarning.rule == rule)[:25]
             )
 
             e = discord.Embed(title=f"Warnings for {user.name}")
@@ -101,9 +101,9 @@ async def warnings(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = database.ModerationWarning.select().where(
-                database.ModerationWarning.user_id == user.id
-            )[:25]
+            q = ModerationWarning.select().where(ModerationWarning.user_id == user.id)[
+                :25
+            ]
 
             e = discord.Embed(title=f"Warnings for {user.name}")
 
@@ -137,7 +137,7 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            q = database.ModerationWarning.get_by_id(warning_id)
+            q = ModerationWarning.get_by_id(warning_id)
 
             e = discord.Embed(title=f"Warning {warning_id}")
 
@@ -186,7 +186,7 @@ async def remove_warning(interaction: discord.Interaction, warning_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            a = database.ModerationWarning.get_by_id(warning_id)
+            a = ModerationWarning.get_by_id(warning_id)
 
             a.delete_instance()
 

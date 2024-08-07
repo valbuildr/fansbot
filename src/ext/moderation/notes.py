@@ -1,7 +1,7 @@
 import discord
 import discord.ext.commands as commands
 import config
-import database
+from models.moderation import ModerationNote
 from datetime import datetime
 import peewee
 
@@ -27,7 +27,7 @@ async def add_note(
         config.mod_role_id
     )
     if mod_role in interaction.user.roles:
-        database.ModerationNote.create(
+        ModerationNote.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -69,9 +69,9 @@ async def notes(
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
-                database.ModerationNote.select()
-                .where(database.ModerationNote.user_id == user.id)
-                .where(database.ModerationNote.rule == rule)[:25]
+                ModerationNote.select()
+                .where(ModerationNote.user_id == user.id)
+                .where(ModerationNote.rule == rule)[:25]
             )
 
             e = discord.Embed(title=f"Notes for {user.name}")
@@ -91,9 +91,7 @@ async def notes(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = database.ModerationNote.select().where(
-                database.ModerationNote.user_id == user.id
-            )[:25]
+            q = ModerationNote.select().where(ModerationNote.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Notes for {user.name}")
 
@@ -127,7 +125,7 @@ async def note_info(interaction: discord.Interaction, note_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            q = database.ModerationNote.get_by_id(note_id)
+            q = ModerationNote.get_by_id(note_id)
 
             e = discord.Embed(title=f"Note {note_id}")
 
@@ -176,7 +174,7 @@ async def remove_note(interaction: discord.Interaction, note_id: int):
     )
     if mod_role in interaction.user.roles:
         try:
-            a = database.ModerationNote.get_by_id(note_id)
+            a = ModerationNote.get_by_id(note_id)
 
             a.delete_instance()
 
