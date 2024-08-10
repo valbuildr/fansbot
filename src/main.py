@@ -68,8 +68,7 @@ async def rules(interaction: discord.Interaction):
         content = content + f"{line}\n"
 
     await interaction.response.send_message(
-        content=content,
-        ephemeral=True,
+        content=content, ephemeral=True, suppress_embeds=True
     )
 
 
