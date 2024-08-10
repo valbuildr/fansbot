@@ -62,7 +62,6 @@ async def rules(interaction: discord.Interaction):
 
     msg = msg.content.split("\n")
     msg.pop()
-    msg.pop()
     content = ""
     for line in msg:
         content = content + f"{line}\n"
