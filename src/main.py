@@ -12,7 +12,7 @@ from models.moderation import (
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
 
-bot = commands.Bot(command_prefix="*", intents=discord.Intents.all())
+bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
 
 bot.remove_command("help")
