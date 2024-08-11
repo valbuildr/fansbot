@@ -11,6 +11,7 @@ from models.moderation import (
 )
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
+import version
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -74,7 +75,7 @@ async def rules(interaction: discord.Interaction):
 
 
 @bot.command()
-async def version(ctx: commands.Context):
+async def v(ctx: commands.Context):
     await ctx.send(
         content=f"*Version {version.version}*\n*Source code: {version.source_code_link}*"
     )
