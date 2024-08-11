@@ -20,6 +20,7 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
     length="How long to mute the user. (Use 2d 10h 3m 2s format!)",
     proof="Any proof you'd like to add on to the mute. Ex: Message links",
     rule="If a rule was violated, what rule was it?",
+    dm="Whether or not to DM the user about this mute. Defaults to True.",
 )
 async def add_mute(
     interaction: discord.Interaction,
@@ -28,6 +29,7 @@ async def add_mute(
     length: str,
     proof: str = None,
     rule: int = None,
+    dm: bool = True,
 ):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -87,10 +89,11 @@ async def add_mute(
         await user.timeout(b)
 
         # dms
-        try:
-            await user.send(embed=dm_embed)
-        except:
-            pass
+        if dm:
+            try:
+                await user.send(embed=dm_embed)
+            except:
+                pass
 
         # finish
         await interaction.response.send_message(embed=conf_embed)
@@ -139,9 +142,7 @@ async def mutes(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = ModerationMute.select().where(
-                ModerationMute.user_id == user.id
-            )[:25]
+            q = ModerationMute.select().where(ModerationMute.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Mutes for {user.name}")
 

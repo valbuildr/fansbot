@@ -13,6 +13,7 @@ import peewee
     content="The reason for the warning.",
     proof="Any proof you'd like to add on to the warning. Ex: Message links",
     rule="If a rule was violated, what rule was it?",
+    dm="Whether or not to DM the user about this warning. Defaults to True.",
 )
 async def add_warning(
     interaction: discord.Interaction,
@@ -20,6 +21,7 @@ async def add_warning(
     content: str,
     proof: str = None,
     rule: int = None,
+    dm: bool = True,
 ):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -50,10 +52,11 @@ async def add_warning(
             conf_embed.description = conf_embed.description + f"\n> **Rule:** {rule}"
             dm_embed.description = dm_embed.description + f"\n> **Rule:** {rule}"
 
-        try:
-            await user.send(embed=dm_embed)
-        except:
-            pass
+        if dm:
+            try:
+                await user.send(embed=dm_embed)
+            except:
+                pass
 
         await interaction.response.send_message(embed=conf_embed)
     else:

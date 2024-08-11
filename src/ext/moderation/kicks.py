@@ -13,6 +13,7 @@ import peewee
     content="The reason for the kick.",
     proof="Any proof you'd like to add on to the kick. Ex: Message links",
     rule="If a rule was violated, what rule was it?",
+    dm="Whether or not to DM the user about this kick. Defaults to True.",
 )
 async def add_kick(
     interaction: discord.Interaction,
@@ -20,6 +21,7 @@ async def add_kick(
     content: str,
     proof: str = None,
     rule: int = None,
+    dm: bool = True,
 ):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -50,10 +52,11 @@ async def add_kick(
             conf_embed.description = conf_embed.description + f"\n> **Rule:** {rule}"
             dm_embed.description = dm_embed.description + f"\n> **Rule:** {rule}"
 
-        try:
-            await user.send(embed=dm_embed)
-        except:
-            pass
+        if dm:
+            try:
+                await user.send(embed=dm_embed)
+            except:
+                pass
 
         await user.kick(reason=content)
 
@@ -103,9 +106,7 @@ async def kicks(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = ModerationKick.select().where(
-                ModerationKick.user_id == user.id
-            )[:25]
+            q = ModerationKick.select().where(ModerationKick.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Kicks for {user.name}")
 

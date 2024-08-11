@@ -13,6 +13,7 @@ import peewee
     content="The reason for the ban.",
     proof="Any proof you'd like to add on to the ban. Ex: Message links",
     rule="If a rule was violated, what rule was it?",
+    dm="Whether or not to DM the user about this ban. Defaults to True.",
 )
 async def add_ban(
     interaction: discord.Interaction,
@@ -20,6 +21,7 @@ async def add_ban(
     content: str,
     proof: str = None,
     rule: int = None,
+    dm: bool = True,
 ):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -50,10 +52,11 @@ async def add_ban(
             conf_embed.description = conf_embed.description + f"\n> **Rule:** {rule}"
             dm_embed.description = dm_embed.description + f"\n> **Rule:** {rule}"
 
-        try:
-            await user.send(embed=dm_embed)
-        except:
-            pass
+        if dm:
+            try:
+                await user.send(embed=dm_embed)
+            except:
+                pass
 
         await user.ban(reason=content)
 
@@ -103,9 +106,7 @@ async def bans(
 
                 await interaction.response.send_message(embed=e)
         else:
-            q = ModerationBan.select().where(
-                ModerationBan.user_id == user.id
-            )[:25]
+            q = ModerationBan.select().where(ModerationBan.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Bans for {user.name}")
 
