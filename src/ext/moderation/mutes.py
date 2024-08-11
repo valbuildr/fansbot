@@ -59,7 +59,7 @@ async def add_mute(
         a = datetime.now(ZoneInfo("Europe/London"))
         b = a + timedelta(seconds=time)
 
-        ModerationMute.create(
+        created = ModerationMute.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -70,8 +70,8 @@ async def add_mute(
 
         # embeds
         conf_embed = discord.Embed(
-            title=f"{user.name} has been nuted.",
-            description=f"> **Content:** {content}",
+            title=f"{user.name} has been muted.",
+            description=f"> **Content:** {content}\n> **ID:** {created.id}",
         )
 
         dm_embed = discord.Embed(

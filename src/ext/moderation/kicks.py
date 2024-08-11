@@ -27,7 +27,7 @@ async def add_kick(
         config.mod_role_id
     )
     if mod_role in interaction.user.roles:
-        ModerationKick.create(
+        created = ModerationKick.create(
             user_id=user.id,
             content=content,
             proof=proof,
@@ -38,7 +38,7 @@ async def add_kick(
 
         conf_embed = discord.Embed(
             title=f"{user.name} has been kicked.",
-            description=f"> **Content:** {content}",
+            description=f"> **Content:** {content}\n> **ID:** {created.id}",
         )
 
         dm_embed = discord.Embed(
