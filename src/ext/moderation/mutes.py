@@ -34,7 +34,10 @@ async def add_mute(
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         # handle the length argument
         args = length.lower()
         matches = re.findall(time_regex, args)
@@ -116,7 +119,10 @@ async def mutes(
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
@@ -174,7 +180,10 @@ async def mute_info(interaction: discord.Interaction, mute_id: int):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         try:
             q = ModerationMute.get_by_id(mute_id)
 
@@ -223,7 +232,10 @@ async def remove_mute(interaction: discord.Interaction, mute_id: int):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         try:
             a = ModerationMute.get_by_id(mute_id)
 

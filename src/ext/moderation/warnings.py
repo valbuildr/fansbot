@@ -26,7 +26,10 @@ async def add_warning(
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         created = ModerationWarning.create(
             user_id=user.id,
             content=content,
@@ -78,7 +81,10 @@ async def warnings(
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         # this currently only shows the first 25. but once i figure out pagination, it'll be all.
         if rule:
             q = (
@@ -138,7 +144,10 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         try:
             q = ModerationWarning.get_by_id(warning_id)
 
@@ -187,7 +196,10 @@ async def remove_warning(interaction: discord.Interaction, warning_id: int):
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
-    if mod_role in interaction.user.roles:
+    helper_role = interaction.client.get_guild(config.server_id).get_role(
+        config.helper_role_id
+    )
+    if mod_role in interaction.user.roles or helper_role in interaction.user.roles:
         try:
             a = ModerationWarning.get_by_id(warning_id)
 
