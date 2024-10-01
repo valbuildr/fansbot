@@ -62,6 +62,9 @@ async def on_interaction(interaction: discord.Interaction) -> None:
                 await interaction.user.add_roles(
                     discord.Object(id=config.member_role_id)
                 )
+                await interaction.user.remove_roles(
+                    discord.Object(id=config.unverified_role_id)
+                )
 
                 await interaction.response.send_message(
                     content="Thanks for agreeing to the rules, I've added the member role to your profile.",
