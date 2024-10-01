@@ -41,6 +41,14 @@ async def on_ready() -> None:
 
 
 @bot.event
+async def on_member_join(member: discord.Member):
+    if member.guild.id == config.server_id:
+        await member.add_roles(
+            discord.Object(id=config.unverified_role_id)
+        )
+
+
+@bot.event
 async def on_interaction(interaction: discord.Interaction) -> None:
     if interaction.type == discord.InteractionType.component:
         if (
