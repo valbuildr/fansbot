@@ -39,13 +39,13 @@ async def on_ready() -> None:
     notes.add_commands(bot)
     warnings.add_commands(bot)
 
+    # await bot.load_extension("ext.schedules")
+
 
 @bot.event
 async def on_member_join(member: discord.Member):
     if member.guild.id == config.server_id:
-        await member.add_roles(
-            discord.Object(id=config.unverified_role_id)
-        )
+        await member.add_roles(discord.Object(id=config.unverified_role_id))
 
 
 @bot.event
@@ -133,20 +133,22 @@ async def v(ctx: commands.Context) -> None:
     )
 
 
-
-
+@bot.command()
+async def tada(ctx: commands.Context) -> None:
+    async with ctx.typing():
+        await ctx.send(file=discord.File("./src/static/tada.mov"))
+        return
 
 
 @bot.hybrid_group(name="convert")
 async def convert(ctx: commands.Context) -> None:
     if ctx.invoked_subcommand == None:
-        await ctx.send(f"Please proivde a valid subcommand.\nFor a list of valid subcommands, run `{bot.command_prefix}help {ctx.command.name}`")
+        await ctx.send(
+            f"Please proivde a valid subcommand.\nFor a list of valid subcommands, run `{bot.command_prefix}help {ctx.command.name}`"
+        )
 
 
-@convert.command(
-        name="area",
-        description="Convert a unit of area."
-)
+@convert.command(name="area", description="Convert a unit of area.")
 @discord.app_commands.choices(
     unit_from=[
         discord.app_commands.Choice(name="Square kilometer (km²)", value="sqkm"),
@@ -167,14 +169,16 @@ async def convert(ctx: commands.Context) -> None:
         discord.app_commands.Choice(name="Square inch (in²)", value="sqin"),
         discord.app_commands.Choice(name="Hectare (ha)", value="ha"),
         discord.app_commands.Choice(name="Acre (ac)", value="ac"),
-    ]
+    ],
 )
 @discord.app_commands.describe(
     input="The number of units to convert.",
     unit_from="The unit to convet from.",
     unit_to="The unit to convet to.",
 )
-async def convert_area(ctx: commands.Context, input: float, unit_from: str, unit_to: str):
+async def convert_area(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
     descriptions = {
         "sqkm": "km²",
         "sqm": "m²",
@@ -185,16 +189,16 @@ async def convert_area(ctx: commands.Context, input: float, unit_from: str, unit
         "ha": "ha",
         "ac": "ac",
     }
-    
+
     conversion_factors = {
-        "km²": 1e6,            # Square kilometers
-        "m²": 1,               # Square meters (base unit)
-        "mi²": 2.58998811e6,   # Square miles
-        "yd²": 0.83612736,     # Square yards
-        "ft²": 0.09290304,     # Square feet
-        "in²": 0.00064516,     # Square inches
-        "ha": 10000,           # Hectares
-        "ac": 4046.856422      # Acres
+        "km²": 1e6,  # Square kilometers
+        "m²": 1,  # Square meters (base unit)
+        "mi²": 2.58998811e6,  # Square miles
+        "yd²": 0.83612736,  # Square yards
+        "ft²": 0.09290304,  # Square feet
+        "in²": 0.00064516,  # Square inches
+        "ha": 10000,  # Hectares
+        "ac": 4046.856422,  # Acres
     }
 
     # Check if units are valid
@@ -203,54 +207,75 @@ async def convert_area(ctx: commands.Context, input: float, unit_from: str, unit
         return
 
     # Convert the value
-    converted_value = input * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[descriptions[unit_to.lower()]]
+    converted_value = (
+        input
+        * conversion_factors[descriptions[unit_from.lower()]]
+        / conversion_factors[descriptions[unit_to.lower()]]
+    )
 
     # Send the response
-    await ctx.send(f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}")
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
 
 
-@convert.command(
-        name="data-transfer",
-        description="Convert a rate of a data transfer."
-)
+@convert.command(name="data-transfer", description="Convert a rate of a data transfer.")
 @discord.app_commands.choices(
     unit_from=[
         discord.app_commands.Choice(name="Bit per second (b/s)", value="byte"),
         discord.app_commands.Choice(name="Kilobit per second (kb/s)", value="kilobit"),
-        discord.app_commands.Choice(name="Kilobyte per second (kB/s)", value="kilobyte"),
+        discord.app_commands.Choice(
+            name="Kilobyte per second (kB/s)", value="kilobyte"
+        ),
         discord.app_commands.Choice(name="Kibibit per second (Kib/s)", value="kibibit"),
         discord.app_commands.Choice(name="Megabit per second (Mb/s)", value="megabit"),
-        discord.app_commands.Choice(name="Megabyte per second (MB/s)", value="megabyte"),
+        discord.app_commands.Choice(
+            name="Megabyte per second (MB/s)", value="megabyte"
+        ),
         discord.app_commands.Choice(name="Mebibit per second (MiB/s)", value="mebibit"),
         discord.app_commands.Choice(name="Gigabit per second (Gb/s)", value="gigabit"),
-        discord.app_commands.Choice(name="Gigabyte per second (GB/s)", value="gigabyte"),
+        discord.app_commands.Choice(
+            name="Gigabyte per second (GB/s)", value="gigabyte"
+        ),
         discord.app_commands.Choice(name="Gibibit per second (GiB/s)", value="gibibit"),
         discord.app_commands.Choice(name="Terabit per second (Tb/s)", value="terabit"),
-        discord.app_commands.Choice(name="Terabyte per second (TB/s)", value="terabyte"),
+        discord.app_commands.Choice(
+            name="Terabyte per second (TB/s)", value="terabyte"
+        ),
         discord.app_commands.Choice(name="Tebibit per second (TiB/s)", value="tebibit"),
     ],
     unit_to=[
         discord.app_commands.Choice(name="Bit per second (b/s)", value="byte"),
         discord.app_commands.Choice(name="Kilobit per second (kb/s)", value="kilobit"),
-        discord.app_commands.Choice(name="Kilobyte per second (kB/s)", value="kilobyte"),
+        discord.app_commands.Choice(
+            name="Kilobyte per second (kB/s)", value="kilobyte"
+        ),
         discord.app_commands.Choice(name="Kibibit per second (Kib/s)", value="kibibit"),
         discord.app_commands.Choice(name="Megabit per second (Mb/s)", value="megabit"),
-        discord.app_commands.Choice(name="Megabyte per second (MB/s)", value="megabyte"),
+        discord.app_commands.Choice(
+            name="Megabyte per second (MB/s)", value="megabyte"
+        ),
         discord.app_commands.Choice(name="Mebibit per second (MiB/s)", value="mebibit"),
         discord.app_commands.Choice(name="Gigabit per second (Gb/s)", value="gigabit"),
-        discord.app_commands.Choice(name="Gigabyte per second (GB/s)", value="gigabyte"),
+        discord.app_commands.Choice(
+            name="Gigabyte per second (GB/s)", value="gigabyte"
+        ),
         discord.app_commands.Choice(name="Gibibit per second (GiB/s)", value="gibibit"),
         discord.app_commands.Choice(name="Terabit per second (Tb/s)", value="terabit"),
-        discord.app_commands.Choice(name="Terabyte per second (TB/s)", value="terabyte"),
+        discord.app_commands.Choice(
+            name="Terabyte per second (TB/s)", value="terabyte"
+        ),
         discord.app_commands.Choice(name="Tebibit per second (TiB/s)", value="tebibit"),
-    ]
+    ],
 )
 @discord.app_commands.describe(
     input="The number of units to convert.",
     unit_from="The unit to convet from.",
     unit_to="The unit to convet to.",
 )
-async def convert_data_transfer_rate(ctx: commands.Context, input: float, unit_from: str, unit_to: str):
+async def convert_data_transfer_rate(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
     descriptions = {
         "byte": "b/s",
         "kilobit": "kb/s",
@@ -266,7 +291,7 @@ async def convert_data_transfer_rate(ctx: commands.Context, input: float, unit_f
         "terabyte": "TB/s",
         "tebibit": "TiB/s",
     }
-    
+
     conversion_factors = {
         "b/s": 1,
         "kb/s": 1000,
@@ -280,7 +305,7 @@ async def convert_data_transfer_rate(ctx: commands.Context, input: float, unit_f
         "GiB/s": 1024 * 1024 * 1024,
         "Tb/s": 1000000000000,
         "TB/s": 1000000000000 * 8,
-        "TiB/s": 1024 * 1024 * 1024 * 1024
+        "TiB/s": 1024 * 1024 * 1024 * 1024,
     }
 
     # Check if units are valid
@@ -289,16 +314,19 @@ async def convert_data_transfer_rate(ctx: commands.Context, input: float, unit_f
         return
 
     # Convert the value
-    converted_value = input * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[descriptions[unit_to.lower()]]
+    converted_value = (
+        input
+        * conversion_factors[descriptions[unit_from.lower()]]
+        / conversion_factors[descriptions[unit_to.lower()]]
+    )
 
     # Send the response
-    await ctx.send(f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}")
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
 
 
-@convert.command(
-        name="digital-storage",
-        description="Convert size of data."
-)
+@convert.command(name="digital-storage", description="Convert size of data.")
 @discord.app_commands.choices(
     unit_from=[
         discord.app_commands.Choice(name="Bit", value="b"),
@@ -347,14 +375,16 @@ async def convert_data_transfer_rate(ctx: commands.Context, input: float, unit_f
         discord.app_commands.Choice(name="Tebibit", value="TiB"),
         discord.app_commands.Choice(name="Petabyte", value="PB"),
         discord.app_commands.Choice(name="Pebibyte", value="PiB"),
-    ]
+    ],
 )
 @discord.app_commands.describe(
     input="The number of units to convert.",
     unit_from="The unit to convet from.",
     unit_to="The unit to convet to.",
 )
-async def convert_digital_storage(ctx: commands.Context, input: float, unit_from: str, unit_to: str):
+async def convert_digital_storage(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
     descriptions = {
         "bit": "b",
         "kilobit": "kb",
@@ -379,7 +409,7 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         "petabyte": "PB",
         "pebibyte": "PiB",
     }
-    
+
     conversion_factors = {
         "b": 1,
         "kb": 1000,
@@ -402,7 +432,7 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         "TB": 1000000000000 * 8,
         "TiB": 1024 * 1024 * 1024 * 1024 * 8,
         "PB": 1000000000000000 * 8,
-        "PiB": 1024 * 1024 * 1024 * 1024 * 1024 * 8
+        "PiB": 1024 * 1024 * 1024 * 1024 * 1024 * 8,
     }
 
     # Check if units are valid
@@ -411,13 +441,19 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         return
 
     # Convert the value
-    converted_value = input * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[descriptions[unit_to.lower()]]
+    converted_value = (
+        input
+        * conversion_factors[descriptions[unit_from.lower()]]
+        / conversion_factors[descriptions[unit_to.lower()]]
+    )
 
     # Send the response
-    await ctx.send(f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}")
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
 
 
-# TODO: Engery
+# TODO: Energy
 
 
 # TODO: Frequency
@@ -439,8 +475,7 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
 
 
 @convert.command(
-        name="temperature",
-        description="Convert a unit of temperature measurement."
+    name="temperature", description="Convert a unit of temperature measurement."
 )
 @discord.app_commands.choices(
     unit_from=[
@@ -452,33 +487,116 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         discord.app_commands.Choice(name="Celsius", value="c"),
         discord.app_commands.Choice(name="Fahrenheit", value="f"),
         discord.app_commands.Choice(name="Kelvin", value="k"),
-    ]
+    ],
 )
 @discord.app_commands.describe(
     input="The number of units to convert.",
     unit_from="The unit to convet from.",
     unit_to="The unit to convet to.",
 )
-async def convert_temperature(ctx: commands.Context, input: float, unit_from: str, unit_to: str):
+async def convert_temperature(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
     descriptions = {
         "celsius": "C",
         "fahrenheit": "F",
         "kelvin": "K",
         "c": "C",
         "f": "F",
-        "k": "K"
-    }
-    
-    conversion_factors = {
-        "C": 1,
-        "F": 9/5,
-        "K": 1
+        "k": "K",
     }
 
-    conversion_offsets = {
-        "C": 0,
-        "F": 32,
-        "K": 273.15
+    conversion_factors = {"C": 1, "F": 9 / 5, "K": 1}
+
+    conversion_offsets = {"C": 0, "F": 32, "K": 273.15}
+
+    # Check if units are valid
+    if unit_from.lower() not in descriptions or unit_to.lower() not in descriptions:
+        await ctx.send(f"Invalid unit(s). Please use: {', '.join(descriptions.keys())}")
+        return
+
+    # Convert the value
+    converted_value = (
+        input + conversion_offsets[descriptions[unit_from.lower()]]
+    ) * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[
+        descriptions[unit_to.lower()]
+    ] - conversion_offsets[
+        descriptions[unit_to.lower()]
+    ]
+
+    # Send the response
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
+
+
+@convert.command(name="time", description="Convert units of time.")
+@discord.app_commands.choices(
+    unit_from=[
+        discord.app_commands.Choice(name="Nanosecond", value="ns"),
+        discord.app_commands.Choice(name="Microsecond", value="us"),
+        discord.app_commands.Choice(name="Millisecond", value="ms"),
+        discord.app_commands.Choice(name="Second", value="s"),
+        discord.app_commands.Choice(name="Minute", value="m"),
+        discord.app_commands.Choice(name="Hour", value="h"),
+        discord.app_commands.Choice(name="Day", value="d"),
+        discord.app_commands.Choice(name="Week", value="w"),
+        discord.app_commands.Choice(name="Month", value="mo"),
+        discord.app_commands.Choice(name="Calendar year", value="y"),
+        discord.app_commands.Choice(name="Decade", value="decade"),
+        discord.app_commands.Choice(name="Centry", value="centry"),
+    ],
+    unit_to=[
+        discord.app_commands.Choice(name="Nanosecond", value="ns"),
+        discord.app_commands.Choice(name="Microsecond", value="us"),
+        discord.app_commands.Choice(name="Millisecond", value="ms"),
+        discord.app_commands.Choice(name="Second", value="s"),
+        discord.app_commands.Choice(name="Minute", value="m"),
+        discord.app_commands.Choice(name="Hour", value="h"),
+        discord.app_commands.Choice(name="Day", value="d"),
+        discord.app_commands.Choice(name="Week", value="w"),
+        discord.app_commands.Choice(name="Month", value="mo"),
+        discord.app_commands.Choice(name="Calendar year", value="y"),
+        discord.app_commands.Choice(name="Decade", value="decade"),
+        discord.app_commands.Choice(name="Centry", value="centry"),
+    ],
+)
+@discord.app_commands.describe(
+    input="The number of units to convert.",
+    unit_from="The unit to convet from.",
+    unit_to="The unit to convet to.",
+)
+async def convert_time(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
+    descriptions = {
+        "ns": "Nanosecond",
+        "us": "Microsecond",
+        "ms": "",
+        "s": "",
+        "m": "",
+        "h": "",
+        "d": "",
+        "w": "",
+        "mo": "",
+        "y": "",
+        "decade": "",
+        "centry": "",
+    }
+
+    conversion_factors = {
+        "ns": 1e-9,
+        "us": 1e-6,
+        "ms": 1e-3,
+        "s": 1,
+        "m": 60,
+        "h": 3600,
+        "d": 86400,
+        "w": 604800,  # 7 days in a week
+        "mo": 2.628e6,  # Average month length in seconds (365.25 days / 12 months)
+        "y": 3.15576e7,  # Year in seconds
+        "decade": 3.15576e8,  # Decade in seconds
+        "century": 3.15576e9,  # Century in seconds
     }
 
     # Check if units are valid
@@ -487,19 +605,19 @@ async def convert_temperature(ctx: commands.Context, input: float, unit_from: st
         return
 
     # Convert the value
-    converted_value = (input + conversion_offsets[descriptions[unit_from.lower()]]) * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[descriptions[unit_to.lower()]] - conversion_offsets[descriptions[unit_to.lower()]]
+    converted_value = (
+        input
+        * conversion_factors[descriptions[unit_from.lower()]]
+        / conversion_factors[descriptions[unit_to.lower()]]
+    )
 
     # Send the response
-    await ctx.send(f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}")
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
 
 
-# TODO: Time
-
-
-@convert.command(
-        name="volume",
-        description="Convert units of volume."
-)
+@convert.command(name="volume", description="Convert units of volume.")
 @discord.app_commands.choices(
     unit_from=[
         discord.app_commands.Choice(name="US gallon", value="usgal"),
@@ -542,14 +660,16 @@ async def convert_temperature(ctx: commands.Context, input: float, unit_from: st
         discord.app_commands.Choice(name="Imperial teaspoon", value="imptsp"),
         discord.app_commands.Choice(name="Cubic foot", value="ft3"),
         discord.app_commands.Choice(name="Cubic inch", value="in3"),
-    ]
+    ],
 )
 @discord.app_commands.describe(
     input="The number of units to convert.",
     unit_from="The unit to convet from.",
     unit_to="The unit to convet to.",
 )
-async def convert_digital_storage(ctx: commands.Context, input: float, unit_from: str, unit_to: str):
+async def convert_volume(
+    ctx: commands.Context, input: float, unit_from: str, unit_to: str
+):
     descriptions = {
         "usgal": "US gal",
         "usqt": "US qt",
@@ -571,27 +691,27 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         "ft3": "ft³",
         "in3": "in³",
     }
-    
+
     conversion_factors = {
         "US gal": 3.785411784,  # US liquid gallons
-        "US qt": 0.946352946,   # US liquid quarts
-        "US pt": 0.473176473,   # US liquid pints
+        "US qt": 0.946352946,  # US liquid quarts
+        "US pt": 0.473176473,  # US liquid pints
         "US cup": 0.236588237,  # US legal cups
-        "US fl oz": 0.029573529, # US fluid ounces
-        "US tbsp": 0.014786765, # US tablespoons
+        "US fl oz": 0.029573529,  # US fluid ounces
+        "US tbsp": 0.014786765,  # US tablespoons
         "US tsp": 0.004928922,  # US teaspoons
-        "m³": 1,                   # Cubic meters
-        "L": 0.001,                # Liters
-        "mL": 0.000001,             # Milliliters
-        "imp gal": 4.54609,        # Imperial gallons
-        "imp qt": 1.13696,         # Imperial quarts
-        "imp pt": 0.56848,         # Imperial pints
-        "imp cup": 0.28413,        # Imperial cups
-        "imp fl oz": 0.028413,     # Imperial fluid ounces
-        "imp tbsp": 0.014207,     # Imperial tablespoons
-        "imp tsp": 0.004736,      # Imperial teaspoons
-        "ft³": 0.028317,           # Cubic feet
-        "in³": 0.000016387
+        "m³": 1,  # Cubic meters
+        "L": 0.001,  # Liters
+        "mL": 0.000001,  # Milliliters
+        "imp gal": 4.54609,  # Imperial gallons
+        "imp qt": 1.13696,  # Imperial quarts
+        "imp pt": 0.56848,  # Imperial pints
+        "imp cup": 0.28413,  # Imperial cups
+        "imp fl oz": 0.028413,  # Imperial fluid ounces
+        "imp tbsp": 0.014207,  # Imperial tablespoons
+        "imp tsp": 0.004736,  # Imperial teaspoons
+        "ft³": 0.028317,  # Cubic feet
+        "in³": 0.000016387,
     }
 
     # Check if units are valid
@@ -600,14 +720,16 @@ async def convert_digital_storage(ctx: commands.Context, input: float, unit_from
         return
 
     # Convert the value
-    converted_value = input * conversion_factors[descriptions[unit_from.lower()]] / conversion_factors[descriptions[unit_to.lower()]]
+    converted_value = (
+        input
+        * conversion_factors[descriptions[unit_from.lower()]]
+        / conversion_factors[descriptions[unit_to.lower()]]
+    )
 
     # Send the response
-    await ctx.send(f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}")
-
-
-
-
+    await ctx.send(
+        f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
+    )
 
 
 bot.run(config.discord_token)
