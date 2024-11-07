@@ -933,4 +933,26 @@ async def counter_data(ctx: commands.Context):
     await ctx.send(content=f"```json\n{f.read()}\n```")
 
 
+@bot.command(name="counter-list", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def counter_list(ctx: commands.Context):
+    data = json.load(open("src/data/counters.json", "r"))
+
+    e = discord.Embed(title="Counter list")
+
+    iterated = 0
+
+    for entry in data.keys():
+        iterated += 1
+
+        if iterated <= 25:
+            e.add_field(name=f"{entry}", value=f"{data[entry]["name"]}")
+
+    if len(e.fields) == 0:
+        await ctx.send(content="No counters configured.")
+    else:
+        e.timestamp = datetime.now()
+        await ctx.send(embed=e)
+
+
 bot.run(config.discord_token)
