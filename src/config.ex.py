@@ -11,3 +11,5 @@ member_role_id = 0
 
 rules_channel_id = 0
 rules_message_id = 0
+
+polls_channel_id = 0

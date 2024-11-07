@@ -12,6 +12,10 @@ from models.moderation import (
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
 import version
+import json
+import utils
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -46,6 +50,12 @@ async def on_ready() -> None:
 async def on_member_join(member: discord.Member):
     if member.guild.id == config.server_id:
         await member.add_roles(discord.Object(id=config.unverified_role_id))
+
+
+@bot.event
+async def on_message(message: discord.Message):
+    if message.channel.id == config.polls_channel_id and message.poll != None:
+        await message.create_thread(name=message.poll.question)
 
 
 @bot.event
@@ -730,6 +740,195 @@ async def convert_volume(
     await ctx.send(
         f"{input} {descriptions[unit_from.lower()]} is equal to {converted_value:.2f} {descriptions[unit_to.lower()]}"
     )
+
+
+if not os.path.exists("src/data/counters.json"):
+    with open("src/data/counters.json", "w") as file:
+        file.write("{}")
+        file.close()
+
+
+@bot.command(name="counters", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def counters(ctx: commands.Context):
+    data = json.load(open("src/data/counters.json", "r"))
+
+    e = discord.Embed(title="Days since...", color=0x367DB3)
+
+    iterated = 0
+
+    for entry in data.keys():
+        iterated += 1
+
+        time = utils.epoch_to_datetime(str(data[entry]["last"]))
+        now = datetime.now()
+
+        diff = now - time
+
+        st = str(diff.days)
+
+        st = (
+            st.replace("0", ":zero:")
+            .replace("1", ":one:")
+            .replace("2", ":two:")
+            .replace("3", ":three:")
+            .replace("4", ":four:")
+            .replace("5", ":five:")
+            .replace("6", ":six:")
+            .replace("7", ":seven:")
+            .replace("8", ":eight:")
+            .replace("9", ":nine:")
+        )
+
+        if iterated <= 25:
+            if (
+                data[entry]["highest"] is None
+                or str(diff.days) > data[entry]["highest"]
+            ):
+                data[entry]["highest"] = str(diff.days)
+
+            st += f"\n-# Highest: {data[entry]["highest"]}"
+
+            st = (
+                st.replace("0", ":zero:")
+                .replace("1", ":one:")
+                .replace("2", ":two:")
+                .replace("3", ":three:")
+                .replace("4", ":four:")
+                .replace("5", ":five:")
+                .replace("6", ":six:")
+                .replace("7", ":seven:")
+                .replace("8", ":eight:")
+                .replace("9", ":nine:")
+            )
+
+            e.add_field(name=data[entry]["name"], value=st)
+
+    if len(e.fields) == 0:
+        await ctx.send(content="No counters configured.")
+    else:
+        e.set_footer(
+            text='Original data provided by mint corp™️. By "Highest", we either mean the highest since records began, or the highest we could be bothered to find out. mint corp™️ and/or val industries™️ accepts no liability for incorrect values.'
+        )
+        e.timestamp = datetime.now()
+        json.dump(data, open("src/data/counters.json", "w"))
+        await ctx.send(embed=e)
+
+
+@bot.command(name="create-counter", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def create_counter(ctx: commands.Context, *name: str):
+    name = " ".join(name)
+    data = json.load(open("src/data/counters.json", "r"))
+
+    last_entry = 0
+
+    for entry in data.keys():
+        last_entry += last_entry
+        if data[entry]["name"] == name:
+            return await ctx.reply(
+                content=f"A counter with this name already exists as counter #{entry}.\n-# Use `reset-counter {entry}` to reset it, or `delete-counter {entry}` to delete it."
+            )
+
+    data[str(last_entry + 1)] = {
+        "name": name,
+        "last": utils.dt_to_timestamp(datetime.now(ZoneInfo("Europe/London"))),
+    }
+
+    json.dump(data, open("src/data/counters.json", "w"))
+
+    return await ctx.send(content=f'Saved "{name}" as counter #{str(last_entry + 1)}.')
+
+
+@bot.command(name="delete-counter", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def delete_counter(ctx: commands.Context, counter: int):
+    data = json.load(open("src/data/counters.json", "r"))
+
+    if str(counter) in data.keys():
+
+        class Confirmation(discord.ui.View):
+            @discord.ui.button(label="Yes, delete it.", style=discord.ButtonStyle.red)
+            async def yes(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                del data[str(counter)]
+
+                json.dump(data, open("src/data/counters.json", "w"))
+
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has been deleted."
+                )
+
+            @discord.ui.button(
+                label="No, don't delete it.", style=discord.ButtonStyle.gray
+            )
+            async def no(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has **not** been deleted."
+                )
+
+        await ctx.send(
+            content=f'Are you sure you want to delete counter #{counter} ("{data[str(counter)]["name"]}")?',
+            view=Confirmation(),
+        )
+    else:
+        return await ctx.send(content=f"Counter #{counter} does not exist.")
+
+
+@bot.command(name="reset-counter", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def reset_counter(ctx: commands.Context, counter: int):
+    data = json.load(open("src/data/counters.json", "r"))
+
+    if str(counter) in data.keys():
+
+        class Confirmation(discord.ui.View):
+            @discord.ui.button(label="Yes, reset it.", style=discord.ButtonStyle.red)
+            async def yes(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                data[str(counter)]["last"] = utils.dt_to_timestamp(datetime.now(), "a")
+                json.dump(data, open("src/data/counters.json", "w"))
+
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has been reset."
+                )
+
+            @discord.ui.button(
+                label="No, don't reset it.", style=discord.ButtonStyle.gray
+            )
+            async def no(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has **not** been reset."
+                )
+
+        await ctx.send(
+            content=f'Are you sure you want to delete counter #{counter} ("{data[str(counter)]["name"]}")?',
+            view=Confirmation(),
+        )
+    else:
+        return await ctx.send(content=f"Counter #{counter} does not exist.")
+
+
+@bot.command(name="counter-data", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def counter_data(ctx: commands.Context):
+    f = open("src/data/counters.json", "r")
+
+    await ctx.send(content=f"```json\n{f.read()}\n```")
 
 
 bot.run(config.discord_token)
