@@ -750,46 +750,25 @@ if not os.path.exists("src/data/counters.json"):
         file.close()
 
 
-@bot.command(name="counters", hidden=True)
+@bot.group(name="counters", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def counters(ctx: commands.Context):
-    data = json.load(open("src/data/counters.json", "r"))
+    if ctx.invoked_subcommand is None:
+        data = json.load(open("src/data/counters.json", "r"))
 
-    e = discord.Embed(title="Days since...", color=0x367DB3)
+        e = discord.Embed(title="Days since...", color=0x367DB3)
 
-    iterated = 0
+        iterated = 0
 
-    for entry in data.keys():
-        iterated += 1
+        for entry in data.keys():
+            iterated += 1
 
-        time = utils.epoch_to_datetime(str(data[entry]["last"]))
-        now = datetime.now()
+            time = utils.epoch_to_datetime(str(data[entry]["last"]))
+            now = datetime.now()
 
-        diff = now - time
+            diff = now - time
 
-        st = str(diff.days)
-
-        st = (
-            st.replace("0", ":zero:")
-            .replace("1", ":one:")
-            .replace("2", ":two:")
-            .replace("3", ":three:")
-            .replace("4", ":four:")
-            .replace("5", ":five:")
-            .replace("6", ":six:")
-            .replace("7", ":seven:")
-            .replace("8", ":eight:")
-            .replace("9", ":nine:")
-        )
-
-        if iterated <= 25:
-            if (
-                data[entry]["highest"] is None
-                or str(diff.days) > data[entry]["highest"]
-            ):
-                data[entry]["highest"] = str(diff.days)
-
-            st += f"\n-# Highest: {data[entry]["highest"]}"
+            st = str(diff.days)
 
             st = (
                 st.replace("0", ":zero:")
@@ -804,20 +783,42 @@ async def counters(ctx: commands.Context):
                 .replace("9", ":nine:")
             )
 
-            e.add_field(name=data[entry]["name"], value=st)
+            if iterated <= 25:
+                if (
+                    data[entry]["highest"] is None
+                    or str(diff.days) > data[entry]["highest"]
+                ):
+                    data[entry]["highest"] = str(diff.days)
 
-    if len(e.fields) == 0:
-        await ctx.send(content="No counters configured.")
-    else:
-        e.set_footer(
-            text='Original data provided by mint corp™️. By "Highest", we either mean the highest since records began, or the highest we could be bothered to find out. mint corp™️ and/or val industries™️ accepts no liability for incorrect values.'
-        )
-        e.timestamp = datetime.now()
-        json.dump(data, open("src/data/counters.json", "w"))
-        await ctx.send(embed=e)
+                st += f"\n-# Highest: {data[entry]["highest"]}"
+
+                st = (
+                    st.replace("0", ":zero:")
+                    .replace("1", ":one:")
+                    .replace("2", ":two:")
+                    .replace("3", ":three:")
+                    .replace("4", ":four:")
+                    .replace("5", ":five:")
+                    .replace("6", ":six:")
+                    .replace("7", ":seven:")
+                    .replace("8", ":eight:")
+                    .replace("9", ":nine:")
+                )
+
+                e.add_field(name=data[entry]["name"], value=st)
+
+        if len(e.fields) == 0:
+            await ctx.send(content="No counters configured.")
+        else:
+            e.set_footer(
+                text='Original data provided by mint corp™️. By "Highest", we either mean the highest since records began, or the highest we could be bothered to find out. mint corp™️ and/or val industries™️ accepts no liability for incorrect values.'
+            )
+            e.timestamp = datetime.now()
+            json.dump(data, open("src/data/counters.json", "w"))
+            await ctx.send(embed=e)
 
 
-@bot.command(name="create-counter", hidden=True)
+@counters.command(name="create", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def create_counter(ctx: commands.Context, *name: str):
     name = " ".join(name)
@@ -842,7 +843,7 @@ async def create_counter(ctx: commands.Context, *name: str):
     return await ctx.send(content=f'Saved "{name}" as counter #{str(last_entry + 1)}.')
 
 
-@bot.command(name="delete-counter", hidden=True)
+@counters.command(name="delete", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def delete_counter(ctx: commands.Context, counter: int):
     data = json.load(open("src/data/counters.json", "r"))
@@ -884,7 +885,7 @@ async def delete_counter(ctx: commands.Context, counter: int):
         return await ctx.send(content=f"Counter #{counter} does not exist.")
 
 
-@bot.command(name="reset-counter", hidden=True)
+@counters.command(name="reset", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def reset_counter(ctx: commands.Context, counter: int):
     data = json.load(open("src/data/counters.json", "r"))
@@ -925,7 +926,7 @@ async def reset_counter(ctx: commands.Context, counter: int):
         return await ctx.send(content=f"Counter #{counter} does not exist.")
 
 
-@bot.command(name="counter-data", hidden=True)
+@counters.command(name="data", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def counter_data(ctx: commands.Context):
     f = open("src/data/counters.json", "r")
@@ -933,7 +934,7 @@ async def counter_data(ctx: commands.Context):
     await ctx.send(content=f"```json\n{f.read()}\n```")
 
 
-@bot.command(name="counter-list", hidden=True)
+@counters.command(name="list", hidden=True)
 @commands.has_role(config.mod_role_id)
 async def counter_list(ctx: commands.Context):
     data = json.load(open("src/data/counters.json", "r"))
