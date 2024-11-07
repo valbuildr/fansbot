@@ -57,6 +57,8 @@ async def on_message(message: discord.Message):
     if message.channel.id == config.polls_channel_id and message.poll != None:
         await message.create_thread(name=message.poll.question)
 
+    await bot.process_commands(message)
+
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction) -> None:
