@@ -1,5 +1,6 @@
 discord_token = ""
 
+nitro_secret = ""
 
 server_id = 0
 

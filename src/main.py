@@ -758,11 +758,7 @@ async def counters(ctx: commands.Context):
 
         e = discord.Embed(title="Days since...", color=0x367DB3)
 
-        iterated = 0
-
         for entry in data.keys():
-            iterated += 1
-
             time = utils.epoch_to_datetime(str(data[entry]["last"]))
             now = datetime.now()
 
@@ -783,7 +779,7 @@ async def counters(ctx: commands.Context):
                 .replace("9", ":nine:")
             )
 
-            if iterated <= 25:
+            if len(e.fields) <= 25:
                 if (
                     data[entry]["highest"] is None
                     or str(diff.days) > data[entry]["highest"]
@@ -941,12 +937,8 @@ async def counter_list(ctx: commands.Context):
 
     e = discord.Embed(title="Counter list")
 
-    iterated = 0
-
     for entry in data.keys():
-        iterated += 1
-
-        if iterated <= 25:
+        if len(e.fields) <= 25:
             e.add_field(name=f"{entry}", value=f"{data[entry]["name"]}")
 
     if len(e.fields) == 0:
@@ -954,6 +946,67 @@ async def counter_list(ctx: commands.Context):
     else:
         e.timestamp = datetime.now()
         await ctx.send(embed=e)
+
+
+@counters.command(name="set", hidden=True)
+@commands.has_role(config.mod_role_id)
+async def counter_set(ctx: commands.Context, counter: int, value: int):
+    data = json.load(open("src/data/counters.json", "r"))
+
+    time = utils.epoch_to_datetime(str(value))
+    now = datetime.now()
+
+    diff = now - time
+
+    st = str(diff.days)
+
+    st = (
+        st.replace("0", ":zero:")
+        .replace("1", ":one:")
+        .replace("2", ":two:")
+        .replace("3", ":three:")
+        .replace("4", ":four:")
+        .replace("5", ":five:")
+        .replace("6", ":six:")
+        .replace("7", ":seven:")
+        .replace("8", ":eight:")
+        .replace("9", ":nine:")
+    )
+
+    if str(counter) in data.keys():
+
+        class Confirmation(discord.ui.View):
+            @discord.ui.button(label="Yes, change it.", style=discord.ButtonStyle.red)
+            async def yes(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                data[str(counter)]["last"] = value
+                json.dump(data, open("src/data/counters.json", "w"))
+
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has been changed to {st} ({value})."
+                )
+
+            @discord.ui.button(
+                label="No, don't change it.", style=discord.ButtonStyle.gray
+            )
+            async def no(
+                self, interaction: discord.Interaction, button: discord.Button
+            ):
+                await interaction.message.edit(view=None)
+
+                await interaction.response.send_message(
+                    content=f"Counter #{counter} has **not** been changed."
+                )
+
+        await ctx.send(
+            content=f'Are you sure you want to change counter #{counter} ("{data[str(counter)]["name"]}") to {st} ({value})?',
+            view=Confirmation(),
+        )
+    else:
+        return await ctx.send(content=f"Counter #{counter} does not exist.")
 
 
 bot.run(config.discord_token)
