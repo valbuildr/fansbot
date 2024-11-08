@@ -1,26 +1,77 @@
 import discord
 from discord.ext import commands
+from discord import app_commands as appcmds
 
 
-class ConversionCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+area_units = [
+    appcmds.Choice(name="Square kilometer", value="sq km"),
+    appcmds.Choice(name="Square meter", value="sq m"),
+    appcmds.Choice(name="Square mile", value="sq mi"),
+    appcmds.Choice(name="Square yard", value="sq yd"),
+    appcmds.Choice(name="Square foot", value="sq ft"),
+    appcmds.Choice(name="Square inch", value="sq in"),
+    appcmds.Choice(name="Hectare", value="h"),
+    appcmds.Choice(name="Acre", value="a"),
+]
 
-    @commands.group(name="convert", description="Convert group")
-    async def convert(self, ctx: commands.Context):
-        if ctx.invoked_subcommand is None:
-            await ctx.reply(
-                content=f"Please specify a subcommand. To see a list of subcommands, run `{self.bot.command_prefix}convert help"
-            )
+dtr_units = [
+    appcmds.Choice(name="Bit per second", value="Bit"),
+    appcmds.Choice(name="Kilobit per second", value="Kilobit"),
+    appcmds.Choice(name="Kilobyte per second", value="Kilobyte"),
+    appcmds.Choice(name="Kibibit per second", value="Kibibit"),
+    appcmds.Choice(name="Megabit per second", value="Megabit"),
+    appcmds.Choice(name="Megabyte per second", value="Megabyte"),
+    appcmds.Choice(name="Mebibit per second", value="Mebibit"),
+    appcmds.Choice(name="Gigabit per second", value="Gigabit"),
+    appcmds.Choice(name="Gigabyte per second", value="Gigabyte"),
+    appcmds.Choice(name="Gibibit per second", value="Gibibit"),
+    appcmds.Choice(name="Terabit per second", value="Terabit"),
+    appcmds.Choice(name="Terabyte per second", value="Terabyte"),
+    appcmds.Choice(name="Tebibit per second", value="Tebibit"),
+]
 
-    @convert.command(
-        name="help", description="Lists all subcommands of the convert group."
+
+class ConversionCommands(appcmds.Group):
+    @appcmds.command(name="area", description="Convert units of area.")
+    @appcmds.describe(
+        unit_from="The unit do convert from.",
+        unit_to="The unit to convert to.",
+        val_from="The number of units to convert from.",
     )
-    async def help(self, ctx: commands.Context): ...
+    @appcmds.choices(
+        unit_from=area_units,
+        unit_to=area_units,
+    )
+    async def area(
+        self,
+        interaction: discord.Interaction,
+        unit_from: str,
+        unit_to: str,
+        val_from: int,
+    ): ...
 
-    @convert.command(name="area", description="Convert a unit of area.")
-    async def area(self, ctx: commands.Context): ...
+    @appcmds.command(
+        name="data-transfer-rate", description="Convert units of data transfer rate."
+    )
+    @appcmds.describe(
+        unit_from="The unit do convert from.",
+        unit_to="The unit to convert to.",
+        val_from="The number of units to convert from.",
+    )
+    @appcmds.choices(
+        unit_from=dtr_units,
+        unit_to=dtr_units,
+    )
+    async def dtr(
+        self,
+        interaction: discord.Interaction,
+        unit_from: str,
+        unit_to: str,
+        val_from: int,
+    ): ...
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(ConversionCog(bot))
+    bot.add_command(
+        ConversionCommands(name="convert", description="Conversion commands")
+    )
