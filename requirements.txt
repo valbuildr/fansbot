@@ -2,4 +2,3 @@ discord.py[voice]
 peewee
 tzdata
 requests
-pillow
