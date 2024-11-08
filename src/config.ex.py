@@ -1,7 +1,5 @@
 discord_token = ""
 
-nitro_secret = ""
-
 server_id = 0
 
 mod_role_id = 0

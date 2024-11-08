@@ -43,8 +43,6 @@ async def on_ready() -> None:
     notes.add_commands(bot)
     warnings.add_commands(bot)
 
-    # await bot.load_extension("ext.schedules")
-
 
 @bot.event
 async def on_member_join(member: discord.Member):
