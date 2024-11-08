@@ -9,6 +9,7 @@ from models.moderation import (
     ModerationKick,
     ModerationBan,
 )
+from models.economy import Economy, WorkReplies
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
 import version
@@ -34,6 +35,8 @@ async def on_ready() -> None:
             ModerationMute,
             ModerationKick,
             ModerationBan,
+            Economy,
+            WorkReplies,
         ]
     )
 
@@ -42,6 +45,8 @@ async def on_ready() -> None:
     mutes.add_commands(bot)
     notes.add_commands(bot)
     warnings.add_commands(bot)
+
+    await bot.load_extension("ext.economy")
 
 
 @bot.event
