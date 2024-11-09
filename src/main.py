@@ -242,7 +242,8 @@ async def create_counter(ctx: commands.Context, *name: str):
 
     data[str(last_entry + 1)] = {
         "name": name,
-        "last": utils.dt_to_timestamp(datetime.now(ZoneInfo("Europe/London"))),
+        "last": utils.dt_to_timestamp(datetime.now()),
+        "highest": "0"
     }
 
     json.dump(data, open("src/data/counters.json", "w"))
