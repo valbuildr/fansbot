@@ -231,24 +231,25 @@ async def create_counter(ctx: commands.Context, *name: str):
     name = " ".join(name)
     data = json.load(open("src/data/counters.json", "r"))
 
-    last_entry = 0
+    last_entry = list(data.keys())[-1]
 
     for entry in data.keys():
-        last_entry += last_entry
         if data[entry]["name"] == name:
             return await ctx.reply(
                 content=f"A counter with this name already exists as counter #{entry}.\n-# Use `reset-counter {entry}` to reset it, or `delete-counter {entry}` to delete it."
             )
 
-    data[str(last_entry + 1)] = {
+    data[str(int(last_entry) + 1)] = {
         "name": name,
         "last": utils.dt_to_timestamp(datetime.now()),
-        "highest": "0"
+        "highest": "0",
     }
 
     json.dump(data, open("src/data/counters.json", "w"))
 
-    return await ctx.send(content=f'Saved "{name}" as counter #{str(last_entry + 1)}.')
+    return await ctx.send(
+        content=f'Saved "{name}" as counter #{str(int(last_entry) + 1)}.'
+    )
 
 
 @counters.command(name="delete", hidden=True)
