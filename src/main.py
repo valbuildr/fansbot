@@ -393,7 +393,7 @@ async def counter_set(ctx: commands.Context, counter: int, value: int):
             async def yes(
                 self, interaction: discord.Interaction, button: discord.Button
             ):
-                data[str(counter)]["last"] = value
+                data[str(counter)]["last"] = str(value)
                 json.dump(data, open("src/data/counters.json", "w"))
 
                 await interaction.message.edit(view=None)
