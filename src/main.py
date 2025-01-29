@@ -12,10 +12,6 @@ from models.moderation import (
 from models.economy import Economy, WorkReplies
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
-import json
-import utils
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
