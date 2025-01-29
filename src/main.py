@@ -1,3 +1,5 @@
+import time
+
 import discord
 import os
 import config
@@ -89,20 +91,26 @@ async def on_interaction(interaction: discord.Interaction) -> None:
 
 @bot.command(hidden=True)
 @commands.guild_only()
-async def rule_agreement_button(ctx: commands.Context) -> None:
+async def rules_channel_msg(ctx: commands.Context) -> None:
     channel = bot.get_guild(config.server_id).get_channel(config.rules_channel_id)
     mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
 
     if mod_role in ctx.author.roles:
         v = discord.ui.View(timeout=None)
         b = discord.ui.Button(
-            style=discord.ButtonStyle.green,
-            label="I agree!",
+            style=discord.ButtonStyle.primary,
+            label="I agree to the rules listed above.",
             custom_id="agree_to_rules",
         )
         v.add_item(b)
 
-        await channel.send(view=v)
+        rules = open("./src/data/rules.txt", "r").read()
+
+        m = await channel.send(view=v)
+
+        time.sleep(2)
+
+        await m.edit(content=rules, view=v)
 
 
 @bot.command()
