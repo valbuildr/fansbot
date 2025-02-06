@@ -1,5 +1,4 @@
 import time
-
 import discord
 import os
 import config
@@ -14,6 +13,8 @@ from models.moderation import (
 from models.economy import Economy, WorkReplies
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
+import requests
+from datetime import datetime
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -156,6 +157,30 @@ async def tada(ctx: commands.Context) -> None:
     async with ctx.typing():
         await ctx.send(file=discord.File("./src/static/tada.mov"))
         return
+
+
+@bot.command()
+async def bbcd(ctx: commands.Context) -> None:
+    async with ctx.typing():
+        release_info = requests.get(
+            "https://api.github.com/repos/playsamay4/BBCD3_Desktop/releases"
+        ).json()[0]
+
+        embed = discord.Embed()
+        embed.title = release_info["name"]
+        embed.description = release_info["body"]
+        embed.colour = discord.Colour(0x3FB93C)
+        embed.url = release_info["html_url"]
+        embed.set_author(
+            name=release_info["author"]["login"],
+            icon_url=release_info["author"]["avatar_url"],
+            url=release_info["author"]["url"],
+        )
+        embed.timestamp = datetime.fromisoformat(
+            release_info["published_at"].replace("Z", "+00:00")
+        )
+
+        await ctx.send(embed=embed)
 
 
 bot.run(config.discord_token)
