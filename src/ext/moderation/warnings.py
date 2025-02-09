@@ -23,7 +23,7 @@ async def add_warning(
     rule: int = None,
     dm: bool = True,
 ):
-    interaction.response.defer(ephemeral=True)
+    interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -63,9 +63,9 @@ async def add_warning(
             except:
                 pass
 
-        await interaction.response.send_message(embed=conf_embed)
+        await interaction.followup.send(embed=conf_embed)
     else:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             content="You aren't allowed to run this command.",
         )
 
@@ -80,7 +80,7 @@ async def add_warning(
 async def warnings(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    interaction.response.defer(ephemeral=True)
+    interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -100,7 +100,7 @@ async def warnings(
             e = discord.Embed(title=f"Warnings for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"*{user.name} has no warnings tagged with rule {rule}.*",
                 )
             else:
@@ -111,7 +111,7 @@ async def warnings(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
         else:
             q = ModerationWarning.select().where(ModerationWarning.user_id == user.id)[
                 :25
@@ -120,7 +120,7 @@ async def warnings(
             e = discord.Embed(title=f"Warnings for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"*{user.name} has no warnings.*",
                 )
             else:
@@ -131,9 +131,9 @@ async def warnings(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
     else:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             content="You aren't allowed to run this command.",
         )
 
@@ -144,7 +144,7 @@ async def warnings(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to get info on.")
 async def warning_info(interaction: discord.Interaction, warning_id: int):
-    interaction.response.defer(ephemeral=True)
+    interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -181,15 +181,15 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
                 inline=False,
             )
 
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 embed=e,
             )
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content="That warning ID doesn't exist.",
             )
     else:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             content="You aren't allowed to run this command.",
         )
 
@@ -200,7 +200,7 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to remove.")
 async def remove_warning(interaction: discord.Interaction, warning_id: int):
-    interaction.response.defer(ephemeral=True)
+    interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -214,15 +214,15 @@ async def remove_warning(interaction: discord.Interaction, warning_id: int):
 
             a.delete_instance()
 
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content=f"Warning {warning_id} has been deleted.",
             )
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content=f"A warning with the ID {warning_id} doesn't exist.",
             )
     else:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             content="You aren't allowed to run this command.",
         )
 

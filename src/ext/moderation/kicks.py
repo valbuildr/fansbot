@@ -23,7 +23,7 @@ async def add_kick(
     rule: int = None,
     dm: bool = True,
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -79,7 +79,7 @@ async def add_kick(
 async def kicks(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -136,7 +136,7 @@ async def kicks(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(kick_id="The ID of the kick to get info on.")
 async def kick_info(interaction: discord.Interaction, kick_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -185,7 +185,7 @@ async def kick_info(interaction: discord.Interaction, kick_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(kick_id="The ID of the kick to remove.")
 async def remove_kick(interaction: discord.Interaction, kick_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id

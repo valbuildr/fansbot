@@ -23,7 +23,7 @@ async def add_note(
     proof: str = None,
     rule: int = None,
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -67,7 +67,7 @@ async def add_note(
 async def notes(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -129,7 +129,7 @@ async def notes(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(note_id="The ID of the note to get info on.")
 async def note_info(interaction: discord.Interaction, note_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -185,7 +185,7 @@ async def note_info(interaction: discord.Interaction, note_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(note_id="The ID of the note to remove.")
 async def remove_note(interaction: discord.Interaction, note_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id

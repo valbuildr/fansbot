@@ -23,7 +23,7 @@ async def add_ban(
     rule: int = None,
     dm: bool = True,
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -79,7 +79,7 @@ async def add_ban(
 async def bans(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -136,7 +136,7 @@ async def bans(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(ban_id="The ID of the ban to get info on.")
 async def ban_info(interaction: discord.Interaction, ban_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -185,7 +185,7 @@ async def ban_info(interaction: discord.Interaction, ban_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(ban_id="The ID of the ban to remove.")
 async def remove_ban(interaction: discord.Interaction, ban_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id

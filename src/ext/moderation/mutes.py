@@ -31,7 +31,7 @@ async def add_mute(
     rule: int = None,
     dm: bool = True,
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -116,7 +116,7 @@ async def add_mute(
 async def mutes(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -176,7 +176,7 @@ async def mutes(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(mute_id="The ID of the mute to get info on.")
 async def mute_info(interaction: discord.Interaction, mute_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -228,7 +228,7 @@ async def mute_info(interaction: discord.Interaction, mute_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(mute_id="The ID of the mute to remove.")
 async def remove_mute(interaction: discord.Interaction, mute_id: int):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
