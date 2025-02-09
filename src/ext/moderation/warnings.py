@@ -23,6 +23,8 @@ async def add_warning(
     rule: int = None,
     dm: bool = True,
 ):
+    interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -64,7 +66,7 @@ async def add_warning(
         await interaction.response.send_message(embed=conf_embed)
     else:
         await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -78,6 +80,8 @@ async def add_warning(
 async def warnings(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
+    interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -98,7 +102,6 @@ async def warnings(
             if len(q) == 0:
                 await interaction.response.send_message(
                     content=f"*{user.name} has no warnings tagged with rule {rule}.*",
-                    ephemeral=True,
                 )
             else:
                 for entry in q:
@@ -118,7 +121,7 @@ async def warnings(
 
             if len(q) == 0:
                 await interaction.response.send_message(
-                    content=f"*{user.name} has no warnings.*", ephemeral=True
+                    content=f"*{user.name} has no warnings.*",
                 )
             else:
                 for entry in q:
@@ -131,7 +134,7 @@ async def warnings(
                 await interaction.response.send_message(embed=e)
     else:
         await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -141,6 +144,8 @@ async def warnings(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to get info on.")
 async def warning_info(interaction: discord.Interaction, warning_id: int):
+    interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -176,14 +181,16 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
                 inline=False,
             )
 
-            await interaction.response.send_message(embed=e, ephemeral=True)
+            await interaction.response.send_message(
+                embed=e,
+            )
         except peewee.DoesNotExist:
             await interaction.response.send_message(
-                content="That warning ID doesn't exist.", ephemeral=True
+                content="That warning ID doesn't exist.",
             )
     else:
         await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -193,6 +200,8 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to remove.")
 async def remove_warning(interaction: discord.Interaction, warning_id: int):
+    interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -206,16 +215,15 @@ async def remove_warning(interaction: discord.Interaction, warning_id: int):
             a.delete_instance()
 
             await interaction.response.send_message(
-                content=f"Warning {warning_id} has been deleted.", ephemeral=True
+                content=f"Warning {warning_id} has been deleted.",
             )
         except peewee.DoesNotExist:
             await interaction.response.send_message(
                 content=f"A warning with the ID {warning_id} doesn't exist.",
-                ephemeral=True,
             )
     else:
         await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+            content="You aren't allowed to run this command.",
         )
 
 

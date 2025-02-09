@@ -23,6 +23,8 @@ async def add_note(
     proof: str = None,
     rule: int = None,
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -48,10 +50,10 @@ async def add_note(
         if rule:
             e.description = e.description + f"\n> **Rule:** {rule}"
 
-        await interaction.response.send_message(embed=e)
+        await interaction.followup.send(embed=e)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -65,6 +67,8 @@ async def add_note(
 async def notes(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -83,9 +87,8 @@ async def notes(
             e = discord.Embed(title=f"Notes for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"*{user.name} has no notes tagged with rule {rule}.*",
-                    ephemeral=True,
                 )
             else:
                 for entry in q:
@@ -95,15 +98,15 @@ async def notes(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
         else:
             q = ModerationNote.select().where(ModerationNote.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Notes for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
-                    content=f"*{user.name} has no notes.*", ephemeral=True
+                await interaction.followup.send(
+                    content=f"*{user.name} has no notes.*",
                 )
             else:
                 for entry in q:
@@ -113,10 +116,10 @@ async def notes(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -126,6 +129,8 @@ async def notes(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(note_id="The ID of the note to get info on.")
 async def note_info(interaction: discord.Interaction, note_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -161,14 +166,16 @@ async def note_info(interaction: discord.Interaction, note_id: int):
                 inline=False,
             )
 
-            await interaction.response.send_message(embed=e, ephemeral=True)
+            await interaction.followup.send(
+                embed=e,
+            )
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
-                content="That note ID doesn't exist.", ephemeral=True
+            await interaction.followup.send(
+                content="That note ID doesn't exist.",
             )
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command.",
         )
 
 
@@ -178,6 +185,8 @@ async def note_info(interaction: discord.Interaction, note_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(note_id="The ID of the note to remove.")
 async def remove_note(interaction: discord.Interaction, note_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -190,16 +199,16 @@ async def remove_note(interaction: discord.Interaction, note_id: int):
 
             a.delete_instance()
 
-            await interaction.response.send_message(
-                content=f"Note {note_id} has been deleted.", ephemeral=True
+            await interaction.followup.send(
+                content=f"Note {note_id} has been deleted.",
             )
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
-                content=f"A note with the ID {note_id} doesn't exist.", ephemeral=True
+            await interaction.followup.send(
+                content=f"A note with the ID {note_id} doesn't exist.",
             )
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command.",
         )
 
 

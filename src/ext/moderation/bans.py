@@ -23,6 +23,8 @@ async def add_ban(
     rule: int = None,
     dm: bool = True,
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -60,10 +62,10 @@ async def add_ban(
 
         await user.ban(reason=content)
 
-        await interaction.response.send_message(embed=conf_embed)
+        await interaction.followup.send(embed=conf_embed)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -77,6 +79,8 @@ async def add_ban(
 async def bans(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -92,9 +96,8 @@ async def bans(
             e = discord.Embed(title=f"Bans for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"*{user.name} has no bans tagged with rule {rule}.*",
-                    ephemeral=True,
                 )
             else:
                 for entry in q:
@@ -104,16 +107,14 @@ async def bans(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
         else:
             q = ModerationBan.select().where(ModerationBan.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Bans for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
-                    content=f"*{user.name} has no bans.*", ephemeral=True
-                )
+                await interaction.followup.send(content=f"*{user.name} has no bans.*")
             else:
                 for entry in q:
                     e.add_field(
@@ -122,10 +123,10 @@ async def bans(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -135,6 +136,8 @@ async def bans(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(ban_id="The ID of the ban to get info on.")
 async def ban_info(interaction: discord.Interaction, ban_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -167,14 +170,12 @@ async def ban_info(interaction: discord.Interaction, ban_id: int):
                 inline=False,
             )
 
-            await interaction.response.send_message(embed=e, ephemeral=True)
+            await interaction.followup.send(embed=e)
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
-                content="That ban ID doesn't exist.", ephemeral=True
-            )
+            await interaction.followup.send(content="That ban ID doesn't exist.")
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -184,6 +185,8 @@ async def ban_info(interaction: discord.Interaction, ban_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(ban_id="The ID of the ban to remove.")
 async def remove_ban(interaction: discord.Interaction, ban_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -193,17 +196,14 @@ async def remove_ban(interaction: discord.Interaction, ban_id: int):
 
             a.delete_instance()
 
-            await interaction.response.send_message(
-                content=f"Ban {ban_id} has been deleted.", ephemeral=True
-            )
+            await interaction.followup.send(content=f"Ban {ban_id} has been deleted.")
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content=f"A ban with the ID {ban_id} doesn't exist.",
-                ephemeral=True,
             )
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 

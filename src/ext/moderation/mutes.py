@@ -31,6 +31,8 @@ async def add_mute(
     rule: int = None,
     dm: bool = True,
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -47,15 +49,13 @@ async def add_mute(
             try:
                 time += time_dict[k] * float(v)
             except KeyError:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"{k} is an invalid time-key! h/m/s/d are valid!",
-                    ephemeral=True,
                 )
                 return
             except ValueError:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"{v} is not a number!",
-                    ephemeral=True,
                 )
                 return
 
@@ -99,10 +99,10 @@ async def add_mute(
                 pass
 
         # finish
-        await interaction.response.send_message(embed=conf_embed)
+        await interaction.followup.send(embed=conf_embed)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -116,6 +116,8 @@ async def add_mute(
 async def mutes(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -134,9 +136,8 @@ async def mutes(
             e = discord.Embed(title=f"Mutes for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     content=f"*{user.name} has no mutes tagged with rule {rule}.*",
-                    ephemeral=True,
                 )
             else:
                 for entry in q:
@@ -146,16 +147,14 @@ async def mutes(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
         else:
             q = ModerationMute.select().where(ModerationMute.user_id == user.id)[:25]
 
             e = discord.Embed(title=f"Mutes for {user.name}")
 
             if len(q) == 0:
-                await interaction.response.send_message(
-                    content=f"*{user.name} has no mutes.*", ephemeral=True
-                )
+                await interaction.followup.send(content=f"*{user.name} has no mutes.*")
             else:
                 for entry in q:
                     e.add_field(
@@ -164,10 +163,10 @@ async def mutes(
                         inline=False,
                     )
 
-                await interaction.response.send_message(embed=e)
+                await interaction.followup.send(embed=e)
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -177,6 +176,8 @@ async def mutes(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(mute_id="The ID of the mute to get info on.")
 async def mute_info(interaction: discord.Interaction, mute_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -212,14 +213,12 @@ async def mute_info(interaction: discord.Interaction, mute_id: int):
                 inline=False,
             )
 
-            await interaction.response.send_message(embed=e, ephemeral=True)
+            await interaction.followup.send(embed=e)
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
-                content="That mute ID doesn't exist.", ephemeral=True
-            )
+            await interaction.followup.send(content="That mute ID doesn't exist.")
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
@@ -229,6 +228,8 @@ async def mute_info(interaction: discord.Interaction, mute_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(mute_id="The ID of the mute to remove.")
 async def remove_mute(interaction: discord.Interaction, mute_id: int):
+    await interaction.response.defer(ephemeral=True)
+
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
     )
@@ -241,17 +242,14 @@ async def remove_mute(interaction: discord.Interaction, mute_id: int):
 
             a.delete_instance()
 
-            await interaction.response.send_message(
-                content=f"Mute {mute_id} has been deleted.", ephemeral=True
-            )
+            await interaction.followup.send(content=f"Mute {mute_id} has been deleted.")
         except peewee.DoesNotExist:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content=f"A mute with the ID {mute_id} doesn't exist.",
-                ephemeral=True,
             )
     else:
-        await interaction.response.send_message(
-            content="You aren't allowed to run this command.", ephemeral=True
+        await interaction.followup.send(
+            content="You aren't allowed to run this command."
         )
 
 
