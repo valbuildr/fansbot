@@ -23,7 +23,7 @@ async def add_warning(
     rule: int = None,
     dm: bool = True,
 ):
-    interaction.response.defer()
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -80,7 +80,7 @@ async def add_warning(
 async def warnings(
     interaction: discord.Interaction, user: discord.Member, rule: int = None
 ):
-    interaction.response.defer()
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -144,7 +144,7 @@ async def warnings(
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to get info on.")
 async def warning_info(interaction: discord.Interaction, warning_id: int):
-    interaction.response.defer()
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
@@ -200,7 +200,7 @@ async def warning_info(interaction: discord.Interaction, warning_id: int):
 @discord.app_commands.guild_only()
 @discord.app_commands.describe(warning_id="The ID of the warning to remove.")
 async def remove_warning(interaction: discord.Interaction, warning_id: int):
-    interaction.response.defer()
+    await interaction.response.defer()
 
     mod_role = interaction.client.get_guild(config.server_id).get_role(
         config.mod_role_id
