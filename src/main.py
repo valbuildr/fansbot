@@ -134,7 +134,7 @@ async def rules(interaction: discord.Interaction) -> None:
 
 
 @bot.command(name="version")
-async def v(ctx: commands.Context) -> None:
+async def version(ctx: commands.Context) -> None:
     await ctx.send(
         content=f"*Last commit: [`{config.full_commit_id[:7]}`]({config.source_code_link}/commit/{config.full_commit_id})*\n*Source code: {config.source_code_link}*"
     )
