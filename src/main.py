@@ -10,7 +10,6 @@ from models.moderation import (
     ModerationKick,
     ModerationBan,
 )
-from models.economy import Economy, WorkReplies
 import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
 import requests
@@ -22,6 +21,8 @@ bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
 if not os.path.exists("src/data"):
     os.makedirs("src/data")
+if not os.path.exists("src/static"):
+    os.makedirs("src/static")
 
 
 @bot.event
@@ -34,8 +35,6 @@ async def on_ready() -> None:
             ModerationMute,
             ModerationKick,
             ModerationBan,
-            Economy,
-            WorkReplies,
         ]
     )
 
@@ -45,7 +44,7 @@ async def on_ready() -> None:
     notes.add_commands(bot)
     warnings.add_commands(bot)
 
-    await bot.load_extension("ext.economy")
+    # await bot.load_extension("ext.economy")
 
 
 @bot.event
