@@ -208,6 +208,13 @@ async def tada(ctx: commands.Context) -> None:
 
 
 @bot.command()
+async def birthday(ctx: commands.Context):
+    async with ctx.typing():
+        await ctx.send(file=discord.File("./src/static/birthday.mov"))
+        return
+
+
+@bot.command()
 async def bbcd(ctx: commands.Context) -> None:
     async with ctx.typing():
         release_info = requests.get(
