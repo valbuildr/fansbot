@@ -126,23 +126,11 @@ async def sync(ctx: commands.Context) -> None:
 @bot.tree.command(name="rules", description="Gets the server rules!")
 @discord.app_commands.guild_only()
 async def rules(interaction: discord.Interaction) -> None:
-    msg = (
-        await bot.get_guild(config.server_id)
-        .get_channel(config.rules_channel_id)
-        .fetch_message(config.rules_message_id)
-    )
+    f = open("./src/data/rules.txt", "r")
+    rules = f.read()
 
-    msg = msg.content.split("\n")
-    msg.pop()
-    msg.pop()
-    msg.pop()
-    content = ""
-    for line in msg:
-        content = content + f"{line}\n"
-
-    await interaction.response.send_message(
-        content=content, ephemeral=True, suppress_embeds=True
-    )
+    await interaction.response.send_message(content=rules, ephemeral=True)
+    f.close()
 
 
 @bot.command(name="version")
