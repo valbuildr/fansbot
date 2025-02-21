@@ -106,12 +106,13 @@ async def rules_channel_msg(ctx: commands.Context) -> None:
         v.add_item(b)
 
         rules = open("./src/data/rules.txt", "r").read()
+        receive_member_role = open("./src/data/receive_member_role.txt", "r").read()
 
         m = await channel.send(view=v)
 
         time.sleep(2)
 
-        await m.edit(content=rules, view=v)
+        await m.edit(content=rules + "\n\n" + receive_member_role, view=v)
 
 
 @bot.command()
@@ -131,6 +132,56 @@ async def rules(interaction: discord.Interaction) -> None:
 
     await interaction.response.send_message(content=rules, ephemeral=True)
     f.close()
+
+
+@bot.tree.context_menu(name="Update rules file")
+async def update_rules_file(interacton: discord.Interaction, message: discord.Message):
+    mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
+    if interacton.guild.id == config.server_id:
+        if mod_role in interacton.user.roles:
+            f = open("./src/data/rules.txt", "w")
+            f.write(message.content)
+
+            await interacton.response.send_message(
+                content="Updated the rules file!", ephemeral=True
+            )
+            f.close()
+        else:
+            await interacton.response.send_message(
+                content="You don't have the required permissions to do this.",
+                ephemeral=True,
+            )
+    else:
+        await interacton.response.send_message(
+            content="This command can only be used in the BBC Fans server.",
+            ephemeral=True,
+        )
+
+
+@bot.tree.context_menu(name="Update member role file")
+async def update_member_role_file(
+    interacton: discord.Interaction, message: discord.Message
+):
+    mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
+    if interacton.guild.id == config.server_id:
+        if mod_role in interacton.user.roles:
+            f = open("./src/data/receive_member_role.txt", "w")
+            f.write(message.content)
+
+            await interacton.response.send_message(
+                content="Updated the member role file!", ephemeral=True
+            )
+            f.close()
+        else:
+            await interacton.response.send_message(
+                content="You don't have the required permissions to do this.",
+                ephemeral=True,
+            )
+    else:
+        await interacton.response.send_message(
+            content="This command can only be used in the BBC Fans server.",
+            ephemeral=True,
+        )
 
 
 @bot.command(name="version")
