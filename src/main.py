@@ -15,6 +15,7 @@ import database
 from ext.moderation import bans, kicks, mutes, notes, warnings
 import requests
 from datetime import datetime
+import git
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -186,8 +187,9 @@ async def update_member_role_file(
 
 @bot.command(name="version")
 async def version(ctx: commands.Context) -> None:
+    repo = git.Repo(search_parent_directories=True)
     await ctx.send(
-        content=f"*Last commit: [`{config.full_commit_id[:7]}`]({config.source_code_link}/commit/{config.full_commit_id})*\n*Source code: {config.source_code_link}*"
+        content=f"*Last commit: [`{repo.head.object.hexsha[:7]}`]({config.source_code_link}/commit/{repo.head.object.hexsha})*\n*Source code: {config.source_code_link}*"
     )
 
 
