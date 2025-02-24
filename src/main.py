@@ -229,13 +229,8 @@ async def update_member_role_file(
 async def version(ctx: commands.Context) -> None:
     local_repo = git.Repo(search_parent_directories=True)
     last_local_sha = local_repo.head.object.hexsha
-    remote_repo = git.cmd.Git().ls_remote(config.source_code_link, heads=True)
-    last_remote_sha = remote_repo.split(" ")[0]
 
     cont = f"Last local commit: [`{last_local_sha[:7]}`](<{config.source_code_link}/commit/{last_local_sha}>)\nSource code: <{config.source_code_link}>"
-
-    if last_local_sha[:7] != last_remote_sha[:7]:
-        cont += f"\n-# The local code is outdated, the last commit on Github is likely newer than what the bot is currently running. The latest commit on Github is [`{last_remote_sha}`](<{config.source_code_link}/commit/{last_remote_sha.split(" ")[0]}>)."
 
     await ctx.send(content=cont)
 
