@@ -3,6 +3,8 @@ import discord
 import os
 import config
 from discord.ext import commands
+from discord.ext import tasks
+from random import choice
 from models.moderation import (
     ModerationNote,
     ModerationWarning,
@@ -25,6 +27,45 @@ if not os.path.exists("src/static"):
     os.makedirs("src/static")
 
 
+@tasks.loop(seconds=120)
+async def change_status():
+    statuses = [
+        discord.Activity(type=discord.ActivityType.watching, name="BBC One"),
+        discord.Activity(type=discord.ActivityType.watching, name="BBC Two"),
+        discord.Activity(type=discord.ActivityType.watching, name="BBC Three"),
+        discord.Activity(type=discord.ActivityType.watching, name="BBC Four"),
+        discord.Activity(type=discord.ActivityType.watching, name="BBC News"),
+        discord.Activity(type=discord.ActivityType.watching, name="BBC Scotland"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 1"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 1 Xtra"),
+        discord.Activity(
+            type=discord.ActivityType.listening, name="BBC Radio 1 Anthems"
+        ),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 1 Dance"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 2"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 3"),
+        discord.Activity(
+            type=discord.ActivityType.listening, name="BBC Radio 3 Unwind"
+        ),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 4"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 4 Extra"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 5 Live"),
+        discord.Activity(
+            type=discord.ActivityType.listening, name="BBC Radio 5 Sports Extra"
+        ),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Radio 6 Music"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Asian Network"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC World Service"),
+        discord.Activity(type=discord.ActivityType.listening, name="BBC Live News"),
+        discord.CustomActivity(name="Keeping up with the BBC"),
+        discord.CustomActivity(name="beep boop beep"),
+    ]
+
+    chosen = choice(statuses)
+
+    await bot.change_presence(activity=chosen)
+
+
 @bot.event
 async def on_ready() -> None:
     print(f"Logged in as {bot.user.name}")
@@ -44,7 +85,7 @@ async def on_ready() -> None:
     notes.add_commands(bot)
     warnings.add_commands(bot)
 
-    # await bot.load_extension("ext.economy")
+    change_status.start()
 
 
 @bot.event
