@@ -5,62 +5,49 @@ from datetime import datetime
 import utils
 
 
-class TicketCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @commands.command(hidden=True)
-    async def send_ticket_msg(self, ctx: commands.Context):
-        title = open("./src/data/ticket_title.txt", "r").read()
-        description = open("./src/data/ticket_description.txt", "r").read()
-
-        embed = discord.Embed(
-            title=title, description=description, color=discord.Color.blurple()
+class TicketCommands(discord.app_commands.Group):
+    @discord.app_commands.command(name="create", description="Create a new ticket.")
+    async def create(self, interaction: discord.Interaction):
+        cat = interaction.client.get_guild(config.server_id).get_channel(
+            config.ticket_category_id
         )
 
-        ticket_channel = self.bot.get_guild(config.server_id).get_channel(
-            config.ticket_channel_id
+        overwrites = discord.PermissionOverwrite(
+            read_messages=True, send_messages=True, attach_files=True, embed_links=True
         )
 
-        v = discord.ui.View()
-        v.add_item(
-            discord.ui.Button(
-                label="Create Ticket",
-                style=discord.ButtonStyle.primary,
-                custom_id="create_ticket",
+        ticket = await cat.create_text_channel(
+            f'ticket-{utils.dt_to_timestamp(datetime.now(), "a")}',
+            overwrites={interaction.user: overwrites},
+        )
+
+        msg_cont = utils.format_interaction_msg(
+            open("./src/data/ticket_message.txt", "r").read(), interaction
+        )
+
+        await ticket.send(content=msg_cont)
+
+        await interaction.response.send_message(
+            content=f"Ticket created in {ticket.mention}.", ephemeral=True
+        )
+
+    @discord.app_commands.command(name="close", description="Close a ticket.")
+    async def close(self, interaction: discord.Interaction):
+        if (
+            interaction.channel.category.id == config.ticket_category_id
+            and interaction.channel.name.startswith("ticket-")
+        ):
+            overwrites = list(interaction.channel.overwrites.keys())
+
+            new_overwrite = discord.PermissionOverwrite(
+                read_messages=True, send_messages=False
             )
-        )
 
-        await ticket_channel.send(embed=embed, view=v)
+            for user in overwrites:
+                await interaction.channel.set_permissions(user, overwrite=new_overwrite)
 
-        await ctx.send("Ticket message sent!")
-
-    @commands.Cog.listener()
-    async def on_interaction(self, interaction: discord.Interaction):
-        if interaction.type == discord.InteractionType.component:
-            if (
-                interaction.data["custom_id"] == "create_ticket"
-                and interaction.data["component_type"] == 2
-            ):
-                ticket_channel = self.bot.get_guild(config.server_id).get_channel(
-                    config.ticket_channel_id
-                )
-
-                tick = await ticket_channel.create_thread(
-                    name=f"Ticket {utils.dt_to_timestamp(datetime.now(), 'a')}",
-                    type=discord.ChannelType.private_thread,
-                    invitable=True,
-                )
-
-                await tick.send(
-                    content=f"{interaction.user.mention}, please describe your issue, and a staff member will be with you shortly.\n-# To close this ticket, simply close and/or lock the thread.\n-# <@&{config.mod_role_id}>"
-                )
-
-                await interaction.response.send_message(
-                    content=f"Your ticket has been created in {tick.mention}.",
-                    ephemeral=True,
-                )
+            await interaction.response.send_message(content="Ticket closed.")
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(TicketCog(bot))
+    bot.tree.add_command(TicketCommands(name="ticket", description="ticket commands"))
