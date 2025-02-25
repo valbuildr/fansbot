@@ -16,13 +16,21 @@ class TicketCommands(discord.app_commands.Group):
             read_messages=True, send_messages=True, attach_files=True, embed_links=True
         )
 
+        overwriteswmanage = discord.PermissionOverwrite(
+            read_messages=True,
+            send_messages=True,
+            attach_files=True,
+            embed_links=True,
+            manage_channels=True,
+        )
+
         ticket = await cat.create_text_channel(
             f'ticket-{utils.dt_to_timestamp(datetime.now(), "a")}',
             overwrites={
                 interaction.user: overwrites,
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 mod_role: overwrites,
-                interaction.client.user: overwrites,
+                interaction.client.user: overwriteswmanage,
             },
         )
 
