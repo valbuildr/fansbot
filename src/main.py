@@ -87,6 +87,8 @@ async def on_ready() -> None:
 
     change_status.start()
 
+    await bot.load_extension("ext.tickets")
+
 
 @bot.event
 async def on_member_join(member: discord.Member):
@@ -184,10 +186,10 @@ async def update_message_file(
         discord.SelectOption(
             label="Receive Member Role", value="receive_member_role.txt"
         ),
-        # discord.SelectOption(label="Ticket Title", value="ticket_title.txt"),
-        # discord.SelectOption(
-        #     label="Ticket Description", value="ticket_description.txt"
-        # ),
+        discord.SelectOption(label="Ticket Title", value="ticket_title.txt"),
+        discord.SelectOption(
+            label="Ticket Description", value="ticket_description.txt"
+        ),
     ]
 
     class View(discord.ui.View):
@@ -214,6 +216,10 @@ async def update_message_file(
                     content="This command can only be used in the BBC Fans server.",
                     ephemeral=True,
                 )
+
+            await interaction.message.edit(
+                content=f"{select.values[0]} updated", view=None
+            )
 
     await interaction.response.send_message(
         content="Choose a file to update", view=View()
