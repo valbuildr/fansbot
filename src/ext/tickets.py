@@ -48,6 +48,8 @@ class TicketCommands(discord.app_commands.Group):
                 read_messages=True, send_messages=False
             )
 
+            await interaction.response.send_message(content="Ticket closed.")
+
             for overwrite in overwrites:
                 if (
                     overwrite.name != "@everyone"
@@ -60,8 +62,6 @@ class TicketCommands(discord.app_commands.Group):
 
             ticketid = interaction.channel.name.split("-")[1]
             await interaction.channel.edit(name=f"closed-{ticketid}")
-
-            await interaction.response.send_message(content="Ticket closed.")
 
 
 async def setup(bot: commands.Bot):
