@@ -58,6 +58,10 @@ class TicketCommands(discord.app_commands.Group):
                         overwrite, overwrite=new_overwrite
                     )
 
+            await interaction.channel.edit(
+                name=f"closed-{interaction.channel.name.split("-")[1]}"
+            )
+
             await interaction.response.send_message(content="Ticket closed.")
 
 
