@@ -175,54 +175,49 @@ async def rules(interaction: discord.Interaction) -> None:
     f.close()
 
 
-@bot.tree.context_menu(name="Update rules file")
-async def update_rules_file(interacton: discord.Interaction, message: discord.Message):
-    mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
-    if interacton.guild.id == config.server_id:
-        if mod_role in interacton.user.roles:
-            f = open("./src/data/rules.txt", "w")
-            f.write(message.content)
-
-            await interacton.response.send_message(
-                content="Updated the rules file!", ephemeral=True
-            )
-            f.close()
-        else:
-            await interacton.response.send_message(
-                content="You don't have the required permissions to do this.",
-                ephemeral=True,
-            )
-    else:
-        await interacton.response.send_message(
-            content="This command can only be used in the BBC Fans server.",
-            ephemeral=True,
-        )
-
-
-@bot.tree.context_menu(name="Update member role file")
-async def update_member_role_file(
-    interacton: discord.Interaction, message: discord.Message
+@bot.tree.context_menu(name="Update message file")
+async def update_message_file(
+    interaction: discord.Interaction, message: discord.Message
 ):
-    mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
-    if interacton.guild.id == config.server_id:
-        if mod_role in interacton.user.roles:
-            f = open("./src/data/receive_member_role.txt", "w")
-            f.write(message.content)
+    files = [
+        discord.SelectOption(label="Rules", value="rules.txt"),
+        discord.SelectOption(
+            label="Receive Member Role", value="receive_member_role.txt"
+        ),
+        # discord.SelectOption(label="Ticket Title", value="ticket_title.txt"),
+        # discord.SelectOption(
+        #     label="Ticket Description", value="ticket_description.txt"
+        # ),
+    ]
 
-            await interacton.response.send_message(
-                content="Updated the member role file!", ephemeral=True
-            )
-            f.close()
-        else:
-            await interacton.response.send_message(
-                content="You don't have the required permissions to do this.",
-                ephemeral=True,
-            )
-    else:
-        await interacton.response.send_message(
-            content="This command can only be used in the BBC Fans server.",
-            ephemeral=True,
-        )
+    class View(discord.ui.View):
+        @discord.ui.select(cls=discord.ui.Select, options=files)
+        async def select(
+            self, interaction: discord.Interaction, select: discord.ui.Select
+        ):
+            mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
+            if interaction.guild.id == config.server_id:
+                if mod_role in interaction.user.roles:
+                    f = open(f"./src/data/{select.values[0]}", "w")
+                    f.write(message.content)
+
+                    await interaction.response.send_message(
+                        content=f"Updated {select.values[0]}", ephemeral=True
+                    )
+                else:
+                    await interaction.response.send_message(
+                        content="You don't have the required permissions to do this.",
+                        ephemeral=True,
+                    )
+            else:
+                await interaction.response.send_message(
+                    content="This command can only be used in the BBC Fans server.",
+                    ephemeral=True,
+                )
+
+    await interaction.response.send_message(
+        content="Choose a file to update", view=View()
+    )
 
 
 @bot.command(name="version")
