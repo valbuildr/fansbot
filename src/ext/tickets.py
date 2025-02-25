@@ -22,6 +22,7 @@ class TicketCommands(discord.app_commands.Group):
                 interaction.user: overwrites,
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 mod_role: overwrites,
+                interaction.client.user: overwrites,
             },
         )
 
@@ -48,7 +49,11 @@ class TicketCommands(discord.app_commands.Group):
             )
 
             for overwrite in overwrites:
-                if overwrite.name != "@everyone" and overwrite.id != config.mod_role_id:
+                if (
+                    overwrite.name != "@everyone"
+                    and overwrite.id != config.mod_role_id
+                    and overwrite.id != interaction.client.user.id
+                ):
                     await interaction.channel.set_permissions(
                         overwrite, overwrite=new_overwrite
                     )
