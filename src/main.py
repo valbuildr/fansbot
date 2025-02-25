@@ -17,6 +17,7 @@ from ext.moderation import bans, kicks, mutes, notes, warnings
 import requests
 from datetime import datetime
 import git
+import utils
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -177,6 +178,48 @@ async def rules(interaction: discord.Interaction) -> None:
     f.close()
 
 
+@bot.tree.command(
+    name="view-message-file", description="MOD ONLY: View a message file."
+)
+@discord.app_commands.choices(
+    file=[
+        discord.app_commands.Choice(name="Rules", value="rules.txt"),
+        discord.app_commands.Choice(
+            name="Receive Member Role", value="receive_member_role.txt"
+        ),
+        discord.app_commands.Choice(name="Ticket Message", value="ticket_message.txt"),
+    ]
+)
+@discord.app_commands.describe(
+    file="The file to view.", raw="If you want the raw contents, set this to True."
+)
+async def view_message_file(interaction: discord.Interaction, file: str, raw: bool):
+    mod_role = bot.get_guild(config.server_id).get_role(config.mod_role_id)
+    if interaction.guild.id == config.server_id:
+        if mod_role in interaction.user.roles:
+            cont = open(f"./src/data/{file}", "r").read()
+
+            if raw:
+                await interaction.response.send_message(
+                    content=f"{cont}", ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(
+                    content=f"{utils.format_interaction_msg(cont, interaction)}",
+                    ephemeral=True,
+                )
+        else:
+            await interaction.response.send_message(
+                content="You don't have the required permissions to do this.",
+                ephemeral=True,
+            )
+    else:
+        await interaction.response.send_message(
+            content="This command can only be used in the BBC Fans server.",
+            ephemeral=True,
+        )
+
+
 @bot.tree.context_menu(name="Update message file")
 async def update_message_file(
     interaction: discord.Interaction, message: discord.Message
@@ -186,10 +229,7 @@ async def update_message_file(
         discord.SelectOption(
             label="Receive Member Role", value="receive_member_role.txt"
         ),
-        discord.SelectOption(label="Ticket Title", value="ticket_title.txt"),
-        discord.SelectOption(
-            label="Ticket Description", value="ticket_description.txt"
-        ),
+        discord.SelectOption(label="Ticket Message", value="ticket_message.txt"),
     ]
 
     class View(discord.ui.View):
