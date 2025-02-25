@@ -8,9 +8,9 @@ import utils
 class TicketCommands(discord.app_commands.Group):
     @discord.app_commands.command(name="create", description="Create a new ticket.")
     async def create(self, interaction: discord.Interaction):
-        cat = interaction.client.get_guild(config.server_id).get_channel(
-            config.ticket_category_id
-        )
+        guild = interaction.client.get_guild(config.server_id)
+        cat = guild.get_channel(config.ticket_category_id)
+        mod_role = guild.get_role(config.mod_role_id)
 
         overwrites = discord.PermissionOverwrite(
             read_messages=True, send_messages=True, attach_files=True, embed_links=True
@@ -18,7 +18,11 @@ class TicketCommands(discord.app_commands.Group):
 
         ticket = await cat.create_text_channel(
             f'ticket-{utils.dt_to_timestamp(datetime.now(), "a")}',
-            overwrites={interaction.user: overwrites},
+            overwrites={
+                interaction.user: overwrites,
+                guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                mod_role: overwrites,
+            },
         )
 
         msg_cont = utils.format_interaction_msg(
@@ -43,8 +47,11 @@ class TicketCommands(discord.app_commands.Group):
                 read_messages=True, send_messages=False
             )
 
-            for user in overwrites:
-                await interaction.channel.set_permissions(user, overwrite=new_overwrite)
+            for overwrite in overwrites:
+                if overwrite.name != "@everyone" and overwrite.id != config.mod_role_id:
+                    await interaction.channel.set_permissions(
+                        overwrite, overwrite=new_overwrite
+                    )
 
             await interaction.response.send_message(content="Ticket closed.")
 
