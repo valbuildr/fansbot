@@ -102,6 +102,13 @@ async def on_message(message: discord.Message):
     if message.channel.id == config.polls_channel_id and message.poll != None:
         await message.create_thread(name=message.poll.question)
 
+    # censor bot bot
+    if (
+        message.author.id == 1091826653367386254
+        and message.content == ":pepeAngryPing:"
+    ):
+        await message.delete()
+
     await bot.process_commands(message)
 
 
