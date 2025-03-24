@@ -114,7 +114,7 @@ async def on_message(message: discord.Message):
     while censor_nax_change:
         if message.author.id == 1091826653367386254 and len(message.embeds) == 1:
             if (
-                message.content == ""
+                message.content == "<@&1174860300638507121>"
                 and message.embeds[0].description.startswith("NAO has moved to")
                 or message.embeds[0].description.startswith("NAS has moved to")
                 or message.embeds[0].description.startswith("NAT has moved to")
