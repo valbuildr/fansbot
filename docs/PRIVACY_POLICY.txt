@@ -1,4 +1,6 @@
 i don't store any directly identifiable data.
 the only closely identifiable data, is your discord user id, which is public information anyway. 🤷
 
+data is stored with supabase, so please do give their privacy policy a read as well: https://supabase.com/privacy
+
 in case of concern please reach out to me on one of my social media platforms: https://links.valbuilds.xyz
