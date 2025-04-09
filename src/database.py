@@ -1,3 +1,4 @@
-import peewee
+import config
+from supabase import create_client
 
-db = peewee.SqliteDatabase("src/data/database.db")
+supabase_client = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)

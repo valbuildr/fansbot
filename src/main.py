@@ -5,19 +5,14 @@ import config
 from discord.ext import commands
 from discord.ext import tasks
 from random import choice
-from models.moderation import (
-    ModerationNote,
-    ModerationWarning,
-    ModerationMute,
-    ModerationKick,
-    ModerationBan,
-)
 import database
-from ext.moderation import bans, kicks, mutes, notes, warnings
 import requests
 from datetime import datetime
 import git
 import utils
+from logging import getLogger
+
+log = getLogger("discord.fansbot")
 
 bot = commands.Bot(command_prefix="~", intents=discord.Intents.all())
 
@@ -69,26 +64,12 @@ async def change_status():
 
 @bot.event
 async def on_ready() -> None:
-    print(f"Logged in as {bot.user.name}")
-    database.db.create_tables(
-        [
-            ModerationNote,
-            ModerationWarning,
-            ModerationMute,
-            ModerationKick,
-            ModerationBan,
-        ]
-    )
-
-    bans.add_commands(bot)
-    kicks.add_commands(bot)
-    mutes.add_commands(bot)
-    notes.add_commands(bot)
-    warnings.add_commands(bot)
-
     change_status.start()
 
     await bot.load_extension("ext.tickets")
+    await bot.load_extension("ext.moderation")
+
+    log.info(f"Logged in as {bot.user.name}")
 
 
 @bot.event
@@ -158,6 +139,36 @@ async def on_interaction(interaction: discord.Interaction) -> None:
                     content="You already have the member role, so I haven't done anything.",
                     ephemeral=True,
                 )
+        elif (
+            interaction.data["custom_id"] == "appeal_warnings"
+            and interaction.data["component_type"] == 2
+        ):
+            e = discord.Embed(
+                title="How to appeal warnings",
+                description="To appeal a warning, simply open a ticket.\n In https://discord.com/channels/1016626731785928715/1097533655682912416, run `/ticket create` and a staff member will be with you shortly.",
+                color=discord.Color.blue(),
+            )
+            await interaction.response.send_message(embed=e)
+        elif (
+            interaction.data["custom_id"] == "appeal_mutes"
+            and interaction.data["component_type"] == 2
+        ):
+            e = discord.Embed(
+                title="How to appeal mutes",
+                description="To appeal a mute, open a ticket after your mute expires.\n After your mute expires, go to https://discord.com/channels/1016626731785928715/1097533655682912416 and run `/ticket create`. A staff member will be with you shortly.\n-# A way to appeal active mutes is in the works.",
+                color=discord.Color.blue(),
+            )
+            await interaction.response.send_message(embed=e)
+        elif (
+            interaction.data["custom_id"] == "appeal_kicks"
+            and interaction.data["component_type"] == 2
+        ):
+            e = discord.Embed(
+                title="How to appeal kicks",
+                description="To appeal a kick, open a ticket after you rejoin the server.\n After you rejoin the server, go to https://discord.com/channels/1016626731785928715/1097533655682912416 and run `/ticket create`. A staff member will be with you shortly.",
+                color=discord.Color.blue(),
+            )
+            await interaction.response.send_message(embed=e)
 
 
 @bot.command(hidden=True)

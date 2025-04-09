@@ -1,5 +1,5 @@
 discord.py[voice]
-peewee
 tzdata
 requests
 gitpython
+supabase
