@@ -3,6 +3,9 @@ from discord.ext import commands
 import config
 from datetime import datetime
 import utils
+from logging import getLogger
+
+log = getLogger("discord.fansbot")
 
 
 class TicketCommands(discord.app_commands.Group):
@@ -74,3 +77,5 @@ class TicketCommands(discord.app_commands.Group):
 
 async def setup(bot: commands.Bot):
     bot.tree.add_command(TicketCommands(name="ticket", description="ticket commands"))
+
+    log.info("Added ticket commands")
