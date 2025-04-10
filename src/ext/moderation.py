@@ -357,7 +357,7 @@ async def mute(
                     description=f"> **Message from moderator:** {message}\n",
                 )
                 dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
-                dm_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
+                dm_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
                 if rules:
                     dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
                 dm_embed.timestamp = datetime.now()
@@ -386,7 +386,7 @@ async def mute(
                 description=f"> **Message:** {message}\n",
             )
             reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
-            reply_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
+            reply_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
             if dm:
                 reply_embed.description += (
                     f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
