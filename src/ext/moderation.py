@@ -960,7 +960,7 @@ class CaseManagement(appcmds.Group):
                 )
                 if dm:
                     log_embed.description += (
-                        f"> **Could DM User:** {"Yes" if dm_sent else "No"}"
+                        f"> **Could DM User:** {'Yes' if dm_sent else 'No'}"
                     )
                 log_embed.timestamp = datetime.now()
 
