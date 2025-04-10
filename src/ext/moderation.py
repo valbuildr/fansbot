@@ -70,7 +70,7 @@ async def add_note(
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d['proof'] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -79,7 +79,7 @@ async def add_note(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d['rules'] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -90,7 +90,7 @@ async def add_note(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if rules:
             reply_embed.description += f"> **Rule(s):** {rules}\n"
         if proof:
@@ -109,7 +109,7 @@ async def add_note(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if rules:
             log_embed.description += f"> **Rule(s):** {rules}\n"
         if proof:
@@ -168,7 +168,7 @@ async def warn(
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d['proof'] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -177,7 +177,7 @@ async def warn(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d['rules'] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -189,7 +189,7 @@ async def warn(
                 colour=discord.Colour.yellow(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -217,7 +217,7 @@ async def warn(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -240,7 +240,7 @@ async def warn(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -335,7 +335,7 @@ async def mute(
 
             # add proof to supabase dict, if applicable
             if proof:
-                d["proof"] = proof.split(",, ")
+                d['proof'] = proof.split(",, ")
             # add rules to supabase dict, if applicable
             if rules:
                 r = rules.split(", ")
@@ -344,7 +344,7 @@ async def mute(
                         content="Please provide numbers for the 'rules' parameter."
                     )
                     return
-                d["rules"] = rules.split(", ")
+                d['rules'] = rules.split(", ")
 
             # send data over to supabase
             data = supabase_client.table(table_name).insert(d).execute()
@@ -356,7 +356,7 @@ async def mute(
                     colour=discord.Colour.orange(),
                     description=f"> **Message from moderator:** {message}\n",
                 )
-                dm_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+                dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
                 dm_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
                 if rules:
                     dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
@@ -385,7 +385,7 @@ async def mute(
                 colour=discord.Colour.green(),
                 description=f"> **Message:** {message}\n",
             )
-            reply_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+            reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
             reply_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
             if dm:
                 reply_embed.description += (
@@ -409,7 +409,7 @@ async def mute(
                 colour=discord.Colour.blue(),
                 description=f"> **Message:** {message}\n",
             )
-            log_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+            log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
             log_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
             if dm:
                 log_embed.description += (
@@ -473,7 +473,7 @@ async def kick(
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d['proof'] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -482,7 +482,7 @@ async def kick(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d['rules'] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -494,7 +494,7 @@ async def kick(
                 colour=discord.Colour.red(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -522,7 +522,7 @@ async def kick(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -545,7 +545,7 @@ async def kick(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -609,7 +609,7 @@ async def ban(
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d['proof'] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -618,7 +618,7 @@ async def ban(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d['rules'] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -630,7 +630,7 @@ async def ban(
                 colour=discord.Colour.red(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -649,7 +649,7 @@ async def ban(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -672,7 +672,7 @@ async def ban(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]["id"]}\n"
+        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {"Yes" if could_dm_user else "No"}\n"
@@ -808,8 +808,8 @@ class CaseManagement(appcmds.Group):
                 offset = (page - 1) * L
                 for item in data.data[offset : offset + L]:
                     emb.add_field(
-                        name=f"Case #{item["id"]}",
-                        value=f"> **Message:** {item["message"]}\n> **User:** <@{item["user_id"]}>\n> **Type:** {item["type"]}\n> **Created by:** <@{item["created_by"]}>",
+                        name=f"Case #{item['id']}",
+                        value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {item['type']}\n> **Created by:** <@{item['created_by']}>",
                         inline=False,
                     )
                 emb.set_author(
@@ -857,31 +857,31 @@ class CaseManagement(appcmds.Group):
                 reply_embed = discord.Embed(
                     title=f"Case #{id}", description="", color=discord.Color.blue()
                 )
-                reply_embed.description += f"> **User:** <@{data.data[0]["user_id"]}> ({data.data[0]["user_id"]})\n"
-                reply_embed.description += f"> **Type:** {data.data[0]["type"]}\n"
-                reply_embed.description += f"> **Message:** {data.data[0]["message"]}\n"
-                reply_embed.description += f"> **Created by:** <@{data.data[0]["created_by"]}> ({data.data[0]["created_by"]})\n"
+                reply_embed.description += f"> **User:** <@{data.data[0]['user_id']}> ({data.data[0]['user_id']})\n"
+                reply_embed.description += f"> **Type:** {data.data[0]['type']}\n"
+                reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
+                reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
                 reply_embed.description += (
-                    f"> **Created at:** <t:{data.data[0]["created_at"]}:F>\n"
+                    f"> **Created at:** <t:{data.data[0]['created_at']}:F>\n"
                 )
                 reply_embed.description += (
-                    f"> **Last edited:** <t:{data.data[0]["last_edited"]}:F>\n"
+                    f"> **Last edited:** <t:{data.data[0]['last_edited']}:F>\n"
                 )
-                reply_embed.description += f"> **Status:** {data.data[0]["status"]}\n"
-                if data.data[0]["proof"]:
+                reply_embed.description += f"> **Status:** {data.data[0]['status']}\n"
+                if data.data[0]['proof']:
                     v = ""
 
-                    for p in data.data[0]["proof"]:
+                    for p in data.data[0]['proof']:
                         v += f"- {p}\n"
 
                     reply_embed.add_field(name="Proof", value=v, inline=False)
-                if data.data[0]["rules"]:
-                    reply_embed.description += f"> **Rule(s):** {str(data.data[0]["rules"]).replace("[", "").replace("]", "")}\n"
-                if data.data[0]["expires"]:
-                    reply_embed.description += f"> **Expires:** <t:{data.data[0]["expires"]}:F> (<t:{data.data[0]["expires"]}:R>)\n"
+                if data.data[0]['rules']:
+                    reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace("[', "").replace(']", "")}\n"
+                if data.data[0]['expires']:
+                    reply_embed.description += f"> **Expires:** <t:{data.data[0]['expires']}:F> (<t:{data.data[0]['expires']}:R>)\n"
                 editors = ""
-                for editor in data.data[0]["editors"]:
-                    if editor == data.data[0]["created_by"]:
+                for editor in data.data[0]['editors']:
+                    if editor == data.data[0]['created_by']:
                         editors += f"- <@{editor}> (creator)\n"
                     else:
                         editors += f"- <@{editor}>\n"
@@ -916,15 +916,15 @@ class CaseManagement(appcmds.Group):
             else:
                 dm_sent = False
 
-                if dm and data.data[0]["type"] != "NOTE":
+                if dm and data.data[0]['type'] != "NOTE":
                     dm_embed = discord.Embed(
                         title="One of your cases in BBC Fans has been closed.",
-                        description=f"> **Message:** {data.data[0]["message"]}\n> **Case ID:** {data.data[0]["id"]}\n> **Created:** <t:{data.data[0]["created_at"]}:F>",
+                        description=f"> **Message:** {data.data[0]['message']}\n> **Case ID:** {data.data[0]['id']}\n> **Created:** <t:{data.data[0]['created_at']}:F>",
                         color=discord.Color.blue(),
                     )
                     dm_embed.timestamp = datetime.now()
 
-                    user = await interaction.client.fetch_user(data.data[0]["user_id"])
+                    user = await interaction.client.fetch_user(data.data[0]['user_id'])
 
                     try:
                         await user.send(embed=dm_embed)
