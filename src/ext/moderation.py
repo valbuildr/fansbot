@@ -410,7 +410,7 @@ async def mute(
                 description=f"> **Message:** {message}\n",
             )
             log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
-            log_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, "F")})\n"
+            log_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
             if dm:
                 log_embed.description += (
                     f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
