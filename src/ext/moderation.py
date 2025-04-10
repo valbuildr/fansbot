@@ -944,7 +944,7 @@ class CaseManagement(appcmds.Group):
                 )
                 if dm:
                     reply_embed.description += (
-                        f"> **Could DM User:** {"Yes" if dm_sent else "No"}"
+                        f"> **Could DM User:** {'Yes' if dm_sent else 'No'}"
                     )
                 reply_embed.timestamp = datetime.now()
 
