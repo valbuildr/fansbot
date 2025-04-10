@@ -876,7 +876,7 @@ class CaseManagement(appcmds.Group):
 
                     reply_embed.add_field(name="Proof", value=v, inline=False)
                 if data.data[0]['rules']:
-                    reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace("[', "").replace(']", "")}\n"
+                    reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace("[', '').replace(']", '')}\n"
                 if data.data[0]['expires']:
                     reply_embed.description += f"> **Expires:** <t:{data.data[0]['expires']}:F> (<t:{data.data[0]['expires']}:R>)\n"
                 editors = ""
