@@ -15,6 +15,32 @@ log = getLogger("discord.fansbot")
 table_name = "moderation_case"
 
 
+def format_type(type: str):
+    match type:
+        case "NOTE":
+            return "📝 Note"
+        case "WARN":
+            return "⚠️ Warn"
+        case "MUTE":
+            return "🔇 Mute"
+        case "KICK":
+            return "🥾 Kick"
+        case "BAN":
+            return "🔨 Ban"
+        case _:
+            return "🤷 Unknown"
+
+
+def format_status(status: str):
+    match status:
+        case "OPEN":
+            return "🟢 Open"
+        case "CLOSED":
+            return "🔴 Closed"
+        case _:
+            return "🤷 Unknown"
+
+
 def parse_time_string(time_string: str):
     pattern = r"(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?"
     match = re.match(pattern, time_string)
@@ -809,7 +835,7 @@ class CaseManagement(appcmds.Group):
                 for item in data.data[offset : offset + L]:
                     emb.add_field(
                         name=f"Case #{item['id']}",
-                        value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {item['type']}\n> **Created by:** <@{item['created_by']}>",
+                        value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {format_type(item['type'])}\n> **Created by:** <@{item['created_by']}>",
                         inline=False,
                     )
                 emb.set_author(
@@ -858,7 +884,7 @@ class CaseManagement(appcmds.Group):
                     title=f"Case #{id}", description="", color=discord.Color.blue()
                 )
                 reply_embed.description += f"> **User:** <@{data.data[0]['user_id']}> ({data.data[0]['user_id']})\n"
-                reply_embed.description += f"> **Type:** {data.data[0]['type']}\n"
+                reply_embed.description += f"> **Type:** {format_type(data.data[0]['type'])}\n"
                 reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
                 reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
                 reply_embed.description += (
@@ -867,7 +893,7 @@ class CaseManagement(appcmds.Group):
                 reply_embed.description += (
                     f"> **Last edited:** <t:{data.data[0]['last_edited']}:F>\n"
                 )
-                reply_embed.description += f"> **Status:** {data.data[0]['status']}\n"
+                reply_embed.description += f"> **Status:** {format_status(data.data[0]['status'])}\n"
                 if data.data[0]['proof']:
                     v = ""
 
