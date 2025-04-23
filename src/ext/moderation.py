@@ -900,7 +900,7 @@ class CaseManagement(appcmds.Group):
                     for p in data.data[0]['proof']:
                         v += f"- {p}\n"
 
-                    reply_embed.add_field(name="Proof", value=v, inline=False)
+                    reply_embed.add_field(name="Proof Piece(s)", value=v, inline=False)
                 if data.data[0]['rules']:
                     reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace('[', '').replace(']', '')}\n"
                 if data.data[0]['expires']:
