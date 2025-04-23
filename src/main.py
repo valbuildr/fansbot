@@ -55,6 +55,7 @@ async def change_status():
         discord.Activity(type=discord.ActivityType.listening, name="BBC Live News"),
         discord.CustomActivity(name="Keeping up with the BBC"),
         discord.CustomActivity(name="beep boop beep"),
+        discord.CustomActivity(name="Now hosted entirely in the UK!"),
     ]
 
     chosen = choice(statuses)
