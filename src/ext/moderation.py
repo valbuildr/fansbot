@@ -826,6 +826,11 @@ class CaseManagement(appcmds.Group):
                 data = data.eq("status", status)
             data = data.execute()
 
+            # ensure the bot sends a response even when there is no cases found
+            if len(data.data) == 0:
+                await interaction.followup.send(content="No cases found.")
+                return
+
             L = 5  # elements per page
 
             # create pagination
