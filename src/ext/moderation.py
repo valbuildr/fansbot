@@ -92,11 +92,12 @@ async def add_note(
             "created_at": utils.dt_to_timestamp(datetime.now(), ""),
             "editors": [str(interaction.user.id)],
             "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
+            "is_test_data": config.IS_TEST_ENV,
         }
 
         # add proof to supabase dict, if applicable
         if proof:
-            d['proof'] = proof.split(",, ")
+            d["proof"] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -105,7 +106,7 @@ async def add_note(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d['rules'] = rules.split(", ")
+            d["rules"] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -190,11 +191,12 @@ async def warn(
             "created_at": utils.dt_to_timestamp(datetime.now(), ""),
             "editors": [str(interaction.user.id)],
             "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
+            "is_test_data": config.IS_TEST_ENV,
         }
 
         # add proof to supabase dict, if applicable
         if proof:
-            d['proof'] = proof.split(",, ")
+            d["proof"] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -203,7 +205,7 @@ async def warn(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d['rules'] = rules.split(", ")
+            d["rules"] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -357,11 +359,12 @@ async def mute(
                 "expires": str(utils.dt_to_timestamp(datetime.now() + len, "")),
                 "editors": [str(interaction.user.id)],
                 "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
+                "is_test_data": config.IS_TEST_ENV,
             }
 
             # add proof to supabase dict, if applicable
             if proof:
-                d['proof'] = proof.split(",, ")
+                d["proof"] = proof.split(",, ")
             # add rules to supabase dict, if applicable
             if rules:
                 r = rules.split(", ")
@@ -370,7 +373,7 @@ async def mute(
                         content="Please provide numbers for the 'rules' parameter."
                     )
                     return
-                d['rules'] = rules.split(", ")
+                d["rules"] = rules.split(", ")
 
             # send data over to supabase
             data = supabase_client.table(table_name).insert(d).execute()
@@ -495,11 +498,12 @@ async def kick(
             "created_at": utils.dt_to_timestamp(datetime.now(), ""),
             "editors": [str(interaction.user.id)],
             "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
+            "is_test_data": config.IS_TEST_ENV,
         }
 
         # add proof to supabase dict, if applicable
         if proof:
-            d['proof'] = proof.split(",, ")
+            d["proof"] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -508,7 +512,7 @@ async def kick(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d['rules'] = rules.split(", ")
+            d["rules"] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -631,11 +635,12 @@ async def ban(
             "created_at": utils.dt_to_timestamp(datetime.now(), ""),
             "editors": [str(interaction.user.id)],
             "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
+            "is_test_data": config.IS_TEST_ENV,
         }
 
         # add proof to supabase dict, if applicable
         if proof:
-            d['proof'] = proof.split(",, ")
+            d["proof"] = proof.split(",, ")
         # add rules to supabase dict, if applicable
         if rules:
             r = rules.split(", ")
@@ -644,7 +649,7 @@ async def ban(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d['rules'] = rules.split(", ")
+            d["rules"] = rules.split(", ")
 
         # send data over to supabase
         data = supabase_client.table(table_name).insert(d).execute()
@@ -889,7 +894,9 @@ class CaseManagement(appcmds.Group):
                     title=f"Case #{id}", description="", color=discord.Color.blue()
                 )
                 reply_embed.description += f"> **User:** <@{data.data[0]['user_id']}> ({data.data[0]['user_id']})\n"
-                reply_embed.description += f"> **Type:** {format_type(data.data[0]['type'])}\n"
+                reply_embed.description += (
+                    f"> **Type:** {format_type(data.data[0]['type'])}\n"
+                )
                 reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
                 reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
                 reply_embed.description += (
@@ -898,21 +905,23 @@ class CaseManagement(appcmds.Group):
                 reply_embed.description += (
                     f"> **Last edited:** <t:{data.data[0]['last_edited']}:F>\n"
                 )
-                reply_embed.description += f"> **Status:** {format_status(data.data[0]['status'])}\n"
-                if data.data[0]['proof']:
+                reply_embed.description += (
+                    f"> **Status:** {format_status(data.data[0]['status'])}\n"
+                )
+                if data.data[0]["proof"]:
                     v = ""
 
-                    for p in data.data[0]['proof']:
+                    for p in data.data[0]["proof"]:
                         v += f"- {p}\n"
 
                     reply_embed.add_field(name="Proof Piece(s)", value=v, inline=False)
-                if data.data[0]['rules']:
+                if data.data[0]["rules"]:
                     reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace('[', '').replace(']', '')}\n"
-                if data.data[0]['expires']:
+                if data.data[0]["expires"]:
                     reply_embed.description += f"> **Expires:** <t:{data.data[0]['expires']}:F> (<t:{data.data[0]['expires']}:R>)\n"
                 editors = ""
-                for editor in data.data[0]['editors']:
-                    if editor == data.data[0]['created_by']:
+                for editor in data.data[0]["editors"]:
+                    if editor == data.data[0]["created_by"]:
                         editors += f"- <@{editor}> (creator)\n"
                     else:
                         editors += f"- <@{editor}>\n"
@@ -947,7 +956,7 @@ class CaseManagement(appcmds.Group):
             else:
                 dm_sent = False
 
-                if dm and data.data[0]['type'] != "NOTE":
+                if dm and data.data[0]["type"] != "NOTE":
                     dm_embed = discord.Embed(
                         title="One of your cases in BBC Fans has been closed.",
                         description=f"> **Message:** {data.data[0]['message']}\n> **Case ID:** {data.data[0]['id']}\n> **Created:** <t:{data.data[0]['created_at']}:F>",
@@ -955,7 +964,7 @@ class CaseManagement(appcmds.Group):
                     )
                     dm_embed.timestamp = datetime.now()
 
-                    user = await interaction.client.fetch_user(data.data[0]['user_id'])
+                    user = await interaction.client.fetch_user(data.data[0]["user_id"])
 
                     try:
                         await user.send(embed=dm_embed)
