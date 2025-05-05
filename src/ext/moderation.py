@@ -820,7 +820,11 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = supabase_client.table(table_name).select("*")
+            data = (
+                supabase_client.table(table_name)
+                .select("*")
+                .eq("is_test_data", config.IS_TEST_ENV)
+            )
             if user:
                 data = data.eq("user_id", str(user.id))
             if type:
@@ -881,7 +885,13 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = supabase_client.table(table_name).select("*").eq("id", id).execute()
+            data = (
+                supabase_client.table(table_name)
+                .select("*")
+                .eq("id", id)
+                .eq("is_test_data", config.IS_TEST_ENV)
+                .execute()
+            )
 
             # check if any data is actually returned
             if len(data.data) <= 0:
@@ -945,7 +955,13 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = supabase_client.table(table_name).select("*").eq("id", id).execute()
+            data = (
+                supabase_client.table(table_name)
+                .select("*")
+                .eq("id", id)
+                .eq("is_test_data", config.IS_TEST_ENV)
+                .execute()
+            )
 
             # check if any data is actually returned
             if len(data.data) <= 0:
@@ -1029,7 +1045,13 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = supabase_client.table(table_name).select("*").eq("id", id).execute()
+            data = (
+                supabase_client.table(table_name)
+                .select("*")
+                .eq("id", id)
+                .eq("is_test_data", config.IS_TEST_ENV)
+                .execute()
+            )
 
             # check if any data is actually returned
             if len(data.data) <= 0:
