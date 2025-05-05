@@ -5,7 +5,7 @@ from datetime import datetime
 import utils
 from logging import getLogger
 
-log = getLogger("discord.fansbot")
+log = getLogger("discord.fansbot.ext.tickets")
 
 
 class TicketCommands(discord.app_commands.Group):

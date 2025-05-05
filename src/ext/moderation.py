@@ -9,7 +9,7 @@ import utils
 from logging import getLogger
 import re
 
-log = getLogger("discord.fansbot")
+log = getLogger("discord.fansbot.ext.moderation")
 
 
 table_name = "moderation_case"
