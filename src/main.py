@@ -63,9 +63,37 @@ async def change_status():
     await bot.change_presence(activity=chosen)
 
 
+@tasks.loop(hours=1)
+async def auto_move_specials():
+    guild = bot.get_guild(config.SERVER_ID)
+
+    channel = guild.get_channel(config.SPECIALS_CHANNEL_ID)
+    if channel.type == discord.ChannelType.forum:
+        tags = channel.available_tags
+        archive_tag = None
+        for tag in tags:
+            if tag.name == config.SPECIALS_ARCHIVE_TAG_NAME:
+                archive_tag = tag
+        
+        active_post = False
+
+        for post in channel.threads:
+            if archive_tag not in post.applied_tags and post.archived == False and post.locked == False:
+                active_post = True
+        
+        main_cat = guild.get_channel(config.MAIN_CATEGORY_ID)
+        other_cat = guild.get_channel(config.OTHER_CATEGORY_ID)
+
+        if active_post:
+            await channel.move(beginning=True, offset=1, category=main_cat)
+        else:
+            await channel.move(end=True, category=other_cat)
+
+
 @bot.event
 async def on_ready() -> None:
     change_status.start()
+    auto_move_specials.start()
 
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
