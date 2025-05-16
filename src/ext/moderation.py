@@ -848,7 +848,7 @@ class CaseManagement(appcmds.Group):
                 offset = (page - 1) * L
                 for item in data.data[offset : offset + L]:
                     emb.add_field(
-                        name=f"Case #{item['id']}",
+                        name=f"Case #{item['id']} - {utils.dt_to_timestamp(utils.epoch_to_datetime(item['created_at']), 'R')}",
                         value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {format_type(item['type'])}\n> **Created by:** <@{item['created_by']}>",
                         inline=False,
                     )
@@ -910,10 +910,10 @@ class CaseManagement(appcmds.Group):
                 reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
                 reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
                 reply_embed.description += (
-                    f"> **Created at:** <t:{data.data[0]['created_at']}:F>\n"
+                    f"> **Created at:** <t:{data.data[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['created_at']), 'R')})\n"
                 )
                 reply_embed.description += (
-                    f"> **Last edited:** <t:{data.data[0]['last_edited']}:F>\n"
+                    f"> **Last edited:** <t:{data.data[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['last_edited']), 'R')})\n"
                 )
                 reply_embed.description += (
                     f"> **Status:** {format_status(data.data[0]['status'])}\n"
