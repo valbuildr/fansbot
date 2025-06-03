@@ -109,7 +109,11 @@ async def add_note(
             d["rules"] = rules.split(", ")
 
         # send data over to supabase
-        data = supabase_client.table(table_name).insert(d).execute()
+        try:
+            data = supabase_client.table(table_name).insert(d).execute()
+        except:
+            await interaction.followup.send(content="An error ocurred.")
+            return
 
         # create reply embed
         reply_embed = discord.Embed(
@@ -208,7 +212,11 @@ async def warn(
             d["rules"] = rules.split(", ")
 
         # send data over to supabase
-        data = supabase_client.table(table_name).insert(d).execute()
+        try:
+            data = supabase_client.table(table_name).insert(d).execute()
+        except:
+            await interaction.followup.send(content="An error ocurred.")
+            return
 
         if dm:
             # create dm embed
@@ -376,7 +384,11 @@ async def mute(
                 d["rules"] = rules.split(", ")
 
             # send data over to supabase
-            data = supabase_client.table(table_name).insert(d).execute()
+            try:
+                data = supabase_client.table(table_name).insert(d).execute()
+            except:
+                await interaction.followup.send(content="An error ocurred.")
+                return
 
             if dm:
                 # create dm embed
@@ -515,7 +527,11 @@ async def kick(
             d["rules"] = rules.split(", ")
 
         # send data over to supabase
-        data = supabase_client.table(table_name).insert(d).execute()
+        try:
+            data = supabase_client.table(table_name).insert(d).execute()
+        except:
+            await interaction.followup.send(content="An error ocurred.")
+            return
 
         if dm:
             # create dm embed
@@ -652,7 +668,11 @@ async def ban(
             d["rules"] = rules.split(", ")
 
         # send data over to supabase
-        data = supabase_client.table(table_name).insert(d).execute()
+        try:
+            data = supabase_client.table(table_name).insert(d).execute()
+        except:
+            await interaction.followup.send(content="An error ocurred.")
+            return
 
         if dm:
             # create dm embed
@@ -833,7 +853,12 @@ class CaseManagement(appcmds.Group):
                 data = data.eq("created_by", str(created_by.id))
             if status:
                 data = data.eq("status", status)
-            data = data.execute()
+
+            try:
+                data = data.execute()
+            except:
+                await interaction.followup.send(content="An error ocurred.")
+                return
 
             # ensure the bot sends a response even when there is no cases found
             if len(data.data) == 0:
@@ -885,13 +910,17 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = (
-                supabase_client.table(table_name)
-                .select("*")
-                .eq("id", id)
-                .eq("is_test_data", config.IS_TEST_ENV)
-                .execute()
-            )
+            try:
+                data = (
+                    supabase_client.table(table_name)
+                    .select("*")
+                    .eq("id", id)
+                    .eq("is_test_data", config.IS_TEST_ENV)
+                    .execute()
+                )
+            except:
+                await interaction.followup.send(content="An error ocurred.")
+                return
 
             # check if any data is actually returned
             if len(data.data) <= 0:
@@ -909,12 +938,8 @@ class CaseManagement(appcmds.Group):
                 )
                 reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
                 reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
-                reply_embed.description += (
-                    f"> **Created at:** <t:{data.data[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['created_at']), 'R')})\n"
-                )
-                reply_embed.description += (
-                    f"> **Last edited:** <t:{data.data[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['last_edited']), 'R')})\n"
-                )
+                reply_embed.description += f"> **Created at:** <t:{data.data[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['created_at']), 'R')})\n"
+                reply_embed.description += f"> **Last edited:** <t:{data.data[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['last_edited']), 'R')})\n"
                 reply_embed.description += (
                     f"> **Status:** {format_status(data.data[0]['status'])}\n"
                 )
@@ -955,13 +980,17 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = (
-                supabase_client.table(table_name)
-                .select("*")
-                .eq("id", id)
-                .eq("is_test_data", config.IS_TEST_ENV)
-                .execute()
-            )
+            try:
+                data = (
+                    supabase_client.table(table_name)
+                    .select("*")
+                    .eq("id", id)
+                    .eq("is_test_data", config.IS_TEST_ENV)
+                    .execute()
+                )
+            except:
+                await interaction.followup.send(content="An error ocurred.")
+                return
 
             # check if any data is actually returned
             if len(data.data) <= 0:
@@ -1025,9 +1054,13 @@ class CaseManagement(appcmds.Group):
                 await log_channel.send(embed=log_embed)
 
                 # change data in supabase
-                supabase_client.table(table_name).update({"status": "CLOSED"}).eq(
-                    "id", id
-                ).execute()
+                try:
+                    supabase_client.table(table_name).update({"status": "CLOSED"}).eq(
+                        "id", id
+                    ).execute()
+                except:
+                    await interaction.followup.send(content="An error ocurred.")
+                    return
 
                 # reply
                 await interaction.followup.send(embed=reply_embed)
@@ -1045,13 +1078,17 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = (
-                supabase_client.table(table_name)
-                .select("*")
-                .eq("id", id)
-                .eq("is_test_data", config.IS_TEST_ENV)
-                .execute()
-            )
+            try:
+                data = (
+                    supabase_client.table(table_name)
+                    .select("*")
+                    .eq("id", id)
+                    .eq("is_test_data", config.IS_TEST_ENV)
+                    .execute()
+                )
+            except:
+                await interaction.followup.send(content="An error ocurred.")
+                return
 
             # check if any data is actually returned
             if len(data.data) <= 0:
@@ -1087,7 +1124,11 @@ class CaseManagement(appcmds.Group):
                 await log_channel.send(embed=log_embed)
 
                 # change data in supabase
-                supabase_client.table(table_name).delete().eq("id", id).execute()
+                try:
+                    supabase_client.table(table_name).delete().eq("id", id).execute()
+                except:
+                    await interaction.followup.send(content="An error ocurred.")
+                    return
 
                 # reply
                 await interaction.followup.send(embed=reply_embed)
