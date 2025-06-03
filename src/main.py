@@ -74,13 +74,17 @@ async def auto_move_specials():
         for tag in tags:
             if tag.name == config.SPECIALS_ARCHIVE_TAG_NAME:
                 archive_tag = tag
-        
+
         active_post = False
 
         for post in channel.threads:
-            if archive_tag not in post.applied_tags and post.archived == False and post.locked == False:
+            if (
+                archive_tag not in post.applied_tags
+                and post.archived == False
+                and post.locked == False
+            ):
                 active_post = True
-        
+
         main_cat = guild.get_channel(config.MAIN_CATEGORY_ID)
         other_cat = guild.get_channel(config.OTHER_CATEGORY_ID)
 
@@ -90,10 +94,18 @@ async def auto_move_specials():
             await channel.move(end=True, category=other_cat)
 
 
+@tasks.loop(hours=24)
+async def keep_supabase_alive():
+    # query supabase just so it doesnt archive
+    data = database.supabase_client.table("keep_alive").select("*").execute()
+
+
 @bot.event
 async def on_ready() -> None:
     change_status.start()
     auto_move_specials.start()
+
+    keep_supabase_alive.start()
 
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
