@@ -177,7 +177,7 @@ async def update_scheules():
                 )
             )
             events_full = service["events"]
-            events = service["events"][:30]
+            events = service["events"][:20]
             events_text = ""
             for event in events:
                 events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
@@ -272,7 +272,7 @@ async def update_scheules():
                 )
             )
             events_full = service["events"]
-            events = service["events"][:30]
+            events = service["events"][:20]
             events_text = ""
             for event in events:
                 events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
