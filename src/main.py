@@ -249,7 +249,7 @@ async def update_scheules():
                     view=view,
                     files=[
                         discord.File(
-                            f"src/static/schedule-banners/{tv_services[service["service_id"]]["banner"]}"
+                            f"src/static/schedule-banners/{tv_services[service['service_id']]['banner']}"
                         )
                     ],
                 )
