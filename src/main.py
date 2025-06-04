@@ -114,181 +114,191 @@ async def update_scheules():
 
     data = request.json()
 
-    for service in data["data"]["programs"]:
-        services = {
-            "17920": {
-                "name": "BBC Three HD",
-                "banner": "three.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
-                "type": "tv",
-            },
-            "18048": {
-                "name": "BBC Four HD",
-                "banner": "four.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p01kv81d",
-                "type": "tv",
-            },
-            "17472": {
-                "name": "BBC Two HD",
-                "banner": "two.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
-                "type": "tv",
-            },
-            "17536": {
-                "name": "BBC One London HD",
-                "banner": "one.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
-                "type": "tv",
-            },
-            "4352": {
-                "name": "BBC News [UK]",
-                "banner": "news.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6g",
-                "type": "tv",
-            },
-            "6912": {
-                "name": "BBC Radio 4",
-                "banner": "4.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p00fzl7j",
-                "type": "radio",
-            },
-            "5632": {
-                "name": "BBC Radio 5 Live",
-                "banner": "5.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p00fzl7g",
-                "type": "radio",
-            },
-            "6016": {
-                "name": "BBC World Service [UK DAB/Freeview]",
-                "banner": "worldservice.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p02zbmb3",
-                "type": "radio",
-            },
-        }
+    services = {
+        "18048": {
+            "name": "BBC Four HD",
+            "banner": "four.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p01kv81d",
+            "type": "tv",
+        },
+        "17920": {
+            "name": "BBC Three HD",
+            "banner": "three.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
+            "type": "tv",
+        },
+        "17472": {
+            "name": "BBC Two HD",
+            "banner": "two.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
+            "type": "tv",
+        },
+        "17536": {
+            "name": "BBC One London HD",
+            "banner": "one.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
+            "type": "tv",
+        },
+        "4352": {
+            "name": "BBC News [UK]",
+            "banner": "news.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p00fzl6g",
+            "type": "tv",
+        },
+        "6912": {
+            "name": "BBC Radio 4",
+            "banner": "4.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p00fzl7j",
+            "type": "radio",
+        },
+        "5632": {
+            "name": "BBC Radio 5 Live",
+            "banner": "5.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p00fzl7g",
+            "type": "radio",
+        },
+        "6016": {
+            "name": "BBC World Service [UK DAB/Freeview]",
+            "banner": "worldservice.png",
+            "bbc": "https://www.bbc.co.uk/schedules/p02zbmb3",
+            "type": "radio",
+        },
+    }
 
-        if service["service_id"] in services.keys():
-            view = ui.LayoutView()
-            container = ui.Container()
-            container.add_item(
-                ui.MediaGallery(
-                    discord.MediaGalleryItem(
-                        f"attachment://{services[service['service_id']]['banner']}"
-                    )
-                )
-            )
-            container.add_item(
-                ui.TextDisplay(
-                    f"# {services[service['service_id']]['name']} Schedule for {now.day}/{now.month}/{now.year}"
-                )
-            )
-            events = service["events"]
-            events_text = ""
-            current_event = None
-            # Find the index of the current event
-            current_index = None
-            for i, event in enumerate(events):
-                event_start = datetime.fromisoformat(event['start_time'])
-                if event_start <= now:
-                    if i + 1 >= len(events) or datetime.fromisoformat(events[i + 1]['start_time']) > now:
-                        current_index = i
-            if current_index is None:
-                current_index = 0  # fallback if no current event found
+    # Iterate over services in the order defined in the 'services' dict
+    for service_id in services.keys():
+        # Find the matching service data from the API response
+        service = next((s for s in data["data"]["programs"] if s["service_id"] == service_id), None)
+        if not service:
+            continue
 
-            # Calculate the window of events to display
-            start_idx = max(0, current_index - 3)
-            end_idx = min(len(events), current_index + 1 + 10)  # +1 to include current event
+        view = ui.LayoutView()
+        container = ui.Container()
+        container.add_item(
+            ui.MediaGallery(
+                discord.MediaGalleryItem(
+                    f"attachment://{services[service_id]['banner']}"
+                )
+            )
+        )
+        container.add_item(
+            ui.TextDisplay(
+                f"# {services[service_id]['name']} Schedule for {now.day}/{now.month}/{now.year}"
+            )
+        )
+        events = service["events"]
+        events_text = ""
+        current_event = None
+        # Find the index of the current event
+        current_index = None
+        for i, event in enumerate(events):
+            event_start = datetime.fromisoformat(event["start_time"])
+            if event_start <= now:
+                if (
+                    i + 1 >= len(events)
+                    or datetime.fromisoformat(events[i + 1]["start_time"]) > now
+                ):
+                    current_index = i
+        if current_index is None:
+            current_index = 0  # fallback if no current event found
 
-            for i in range(start_idx, end_idx):
-                event = events[i]
-                event_start = datetime.fromisoformat(event['start_time'])
-                if i == current_index:
-                    events_text += f":arrow_right: **{utils.dt_to_timestamp(event_start, 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})**\n"
-                else:
-                    events_text += f":black_large_square: {utils.dt_to_timestamp(event_start, 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
-            container.add_item(ui.TextDisplay(events_text))
-            container.add_item(ui.Separator())
-            container.add_item(
-                ui.TextDisplay(
-                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), 'f')}"
-                )
-            )
-            container.add_item(
-                ui.Section(
-                    ui.TextDisplay("Full schedule:"),
-                    accessory=ui.Button(
-                        url=services[service["service_id"]]["bbc"], label="Open"
-                    ),
-                )
-            )
-            container.add_item(ui.Separator())
-            container.add_item(
-                ui.TextDisplay(
-                    "-# **This feature is in beta!** Please report any bugs to valbuilded."
-                )
-            )
-            view.add_item(container)
+        # Calculate the window of events to display
+        start_idx = max(0, current_index - 3)
+        end_idx = min(
+            len(events), current_index + 1 + 10
+        )  # +1 to include current event
 
-            if os.path.exists(f"src/data/{service['service_id']}.txt"):
-                # Open file (r)
-                f = open(f"src/data/{service['service_id']}.txt", "r")
-                # Find message
-                if services[service["service_id"]]["type"] == "radio":
-                    channel = (
-                        bot.get_guild(config.SERVER_ID)
-                        .get_channel(config.SCHEDULES_CHANNEL_ID)
-                        .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
-                    )
-                else:
-                    channel = bot.get_guild(config.SERVER_ID).get_channel(
-                        config.SCHEDULES_CHANNEL_ID
-                    )
-                try:
-                    message = await channel.fetch_message(f.read())
-                except:
-                    message = None
-                if message:
-                    # If message found: Edit message
-                    await message.edit(
-                        view=view,
-                    )
-                else:
-                    # Else: Create message
-                    msg = await channel.send(
-                        view=view,
-                        files=[
-                            discord.File(
-                                f"src/static/schedule-banners/{services[service['service_id']]['banner']}"
-                            )
-                        ],
-                    )
-                    # Else: Open file (w)
-                    f = open(f"src/data/{service['service_id']}.txt", "w")
-                    # Else: Write message id to file
-                    f.write(str(msg.id))
+        for i in range(start_idx, end_idx):
+            event = events[i]
+            event_start = datetime.fromisoformat(event["start_time"])
+            if i == current_index:
+                events_text += f":arrow_right: **{utils.dt_to_timestamp(event_start, 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})**\n"
             else:
-                # Open file (w)
-                f = open(f"src/data/{service['service_id']}.txt", "w")
-                # Create message
-                if services[service["service_id"]]["type"] == "radio":
-                    channel = (
-                        bot.get_guild(config.SERVER_ID)
-                        .get_channel(config.SCHEDULES_CHANNEL_ID)
-                        .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
-                    )
-                else:
-                    channel = bot.get_guild(config.SERVER_ID).get_channel(
-                        config.SCHEDULES_CHANNEL_ID
-                    )
+                events_text += f":black_large_square: {utils.dt_to_timestamp(event_start, 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
+        container.add_item(ui.TextDisplay(events_text))
+        container.add_item(ui.Separator())
+        container.add_item(
+            ui.TextDisplay(
+                f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), 'f')}"
+            )
+        )
+        container.add_item(
+            ui.Section(
+                ui.TextDisplay("Full schedule:"),
+                accessory=ui.Button(
+                    url=services[service_id]["bbc"], label="Open"
+                ),
+            )
+        )
+        container.add_item(ui.Separator())
+        container.add_item(
+            ui.TextDisplay(
+                "-# **This feature is in beta!** Please report any bugs to valbuilded."
+            )
+        )
+        view.add_item(container)
+
+        if os.path.exists(f"src/data/{service_id}.txt"):
+            # Open file (r)
+            f = open(f"src/data/{service_id}.txt", "r")
+            # Find message
+            if services[service_id]["type"] == "radio":
+                channel = (
+                    bot.get_guild(config.SERVER_ID)
+                    .get_channel(config.SCHEDULES_CHANNEL_ID)
+                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                )
+            else:
+                channel = bot.get_guild(config.SERVER_ID).get_channel(
+                    config.SCHEDULES_CHANNEL_ID
+                )
+            try:
+                message = await channel.fetch_message(f.read())
+            except:
+                message = None
+            if message:
+                # If message found: Edit message
+                await message.edit(
+                    view=view,
+                )
+            else:
+                # Else: Create message
                 msg = await channel.send(
                     view=view,
                     files=[
                         discord.File(
-                            f"src/static/schedule-banners/{services[service['service_id']]['banner']}"
+                            f"src/static/schedule-banners/{services[service_id]['banner']}"
                         )
                     ],
                 )
-                # Write message id to file
+                # Else: Open file (w)
+                f = open(f"src/data/{service_id}.txt", "w")
+                # Else: Write message id to file
                 f.write(str(msg.id))
+        else:
+            # Open file (w)
+            f = open(f"src/data/{service_id}.txt", "w")
+            # Create message
+            if services[service_id]["type"] == "radio":
+                channel = (
+                    bot.get_guild(config.SERVER_ID)
+                    .get_channel(config.SCHEDULES_CHANNEL_ID)
+                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                )
+            else:
+                channel = bot.get_guild(config.SERVER_ID).get_channel(
+                    config.SCHEDULES_CHANNEL_ID
+                )
+            msg = await channel.send(
+                view=view,
+                files=[
+                    discord.File(
+                        f"src/static/schedule-banners/{services[service_id]['banner']}"
+                    )
+                ],
+            )
+            # Write message id to file
+            f.write(str(msg.id))
 
 
 @bot.event
