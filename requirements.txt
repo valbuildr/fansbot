@@ -1,4 +1,4 @@
-discord.py[voice]
+git+https://github.com/DA-344/d.py@feat/components-v2
 tzdata
 requests
 gitpython
