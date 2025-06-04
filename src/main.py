@@ -186,7 +186,6 @@ async def update_scheules():
         container.add_item(ui.TextDisplay(f"# {services[service_id]['name']} Schedule"))
         events = service["events"]
         events_text = ""
-        current_event = None
         # Find the index of the current event
         current_index = None
         for i, event in enumerate(events):
