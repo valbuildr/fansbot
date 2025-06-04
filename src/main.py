@@ -180,7 +180,7 @@ async def update_scheules():
             events = service["events"][:30]
             events_text = ""
             for event in events:
-                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), "t")} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
+                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
             if len(events_full) > len(events):
                 events_text += (
                     f"**and {len(events_full) - len(events)} more entries...**"
@@ -275,7 +275,7 @@ async def update_scheules():
             events = service["events"][:30]
             events_text = ""
             for event in events:
-                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), "t")} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
+                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), 't')} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
             if len(events_full) > len(events):
                 events_text += (
                     f"**and {len(events_full) - len(events)} more entries...**"
