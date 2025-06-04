@@ -189,7 +189,7 @@ async def update_scheules():
             container.add_item(ui.Separator())
             container.add_item(
                 ui.TextDisplay(
-                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), "f")}"
+                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), 'f')}"
                 )
             )
             container.add_item(
@@ -284,7 +284,7 @@ async def update_scheules():
             container.add_item(ui.Separator())
             container.add_item(
                 ui.TextDisplay(
-                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), "f")}"
+                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), 'f')}"
                 )
             )
             container.add_item(
