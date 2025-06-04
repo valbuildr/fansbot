@@ -164,4 +164,3 @@ cython_debug/
 src/config.py
 src/data
 .vscode/
-src/static

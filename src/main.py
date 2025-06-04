@@ -8,9 +8,11 @@ from random import choice
 import database
 import requests
 from datetime import datetime
+from datetime import timezone
 import git
 import utils
 from logging import getLogger
+from discord import ui
 
 log = getLogger("discord.fansbot")
 
@@ -100,12 +102,266 @@ async def keep_supabase_alive():
     data = database.supabase_client.table("keep_alive").select("*").execute()
 
 
+@tasks.loop(minutes=15)
+async def update_scheules():
+    now = datetime.now(timezone.utc)
+    midnight_utc = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    request = requests.get(
+        "https://www.freeview.co.uk/api/tv-guide",
+        params={"nid": "64257", "start": utils.dt_to_timestamp(midnight_utc, "a")},
+    )
+
+    data = request.json()
+
+    for service in data["data"]["programs"]:
+        tv_services = {
+            "17536": {
+                "name": "BBC One London HD",
+                "banner": "one.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
+            },
+            "17472": {
+                "name": "BBC Two HD",
+                "banner": "two.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
+            },
+            "18048": {
+                "name": "BBC Four HD",
+                "banner": "four.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p01kv81d",
+            },
+            "17920": {
+                "name": "BBC Three HD",
+                "banner": "three.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
+            },
+            "4352": {
+                "name": "BBC News [UK]",
+                "banner": "news.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6g",
+            },
+        }
+
+        radio_services = {
+            "6912": {
+                "name": "BBC Radio 4",
+                "banner": "4.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p00fzl7j",
+            },
+            "5632": {
+                "name": "BBC Radio 5 Live",
+                "banner": "5.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p00fzl7g",
+            },
+            "6016": {
+                "name": "BBC World Service [UK DAB/Freeview]",
+                "banner": "worldservice.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p02zbmb3",
+            },
+        }
+
+        if service["service_id"] in tv_services.keys():
+            view = ui.LayoutView()
+            container = ui.Container()
+            container.add_item(
+                ui.MediaGallery(
+                    discord.MediaGalleryItem(
+                        f"attachment://{tv_services[service['service_id']]['banner']}"
+                    )
+                )
+            )
+            container.add_item(
+                ui.TextDisplay(
+                    f"# {tv_services[service['service_id']]['name']} Schedule for {now.day}/{now.month}/{now.year}"
+                )
+            )
+            events_full = service["events"]
+            events = service["events"][:30]
+            events_text = ""
+            for event in events:
+                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), "t")} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
+            if len(events_full) > len(events):
+                events_text += (
+                    f"**and {len(events_full) - len(events)} more entries...**"
+                )
+            container.add_item(ui.TextDisplay(events_text))
+            container.add_item(ui.Separator())
+            container.add_item(
+                ui.TextDisplay(
+                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), "f")}"
+                )
+            )
+            container.add_item(
+                ui.Section(
+                    ui.TextDisplay("Full schedule:"),
+                    accessory=ui.Button(
+                        url=tv_services[service["service_id"]]["bbc"], label="Open"
+                    ),
+                )
+            )
+            container.add_item(ui.Separator())
+            container.add_item(
+                ui.TextDisplay(
+                    "-# **This feature is in beta!** Please report any bugs to valbuilded."
+                )
+            )
+            view.add_item(container)
+
+            if os.path.exists(f"src/data/{service['service_id']}.txt"):
+                # Open file (r)
+                f = open(f"src/data/{service['service_id']}.txt", "r")
+                # Find message
+                channel = bot.get_guild(config.SERVER_ID).get_channel(
+                    config.SCHEDULES_CHANNEL_ID
+                )
+                try:
+                    message = await channel.fetch_message(f.read())
+                except:
+                    message = None
+                if message:
+                    # If message found: Edit message
+                    await message.edit(
+                        view=view,
+                    )
+                else:
+                    # Else: Create message
+                    msg = await channel.send(
+                        view=view,
+                        files=[
+                            discord.File(
+                                f"src/static/schedule-banners/{tv_services[service["service_id"]]["banner"]}"
+                            )
+                        ],
+                    )
+                    # Else: Open file (w)
+                    f = open(f"src/data/{service['service_id']}.txt", "w")
+                    # Else: Write message id to file
+                    f.write(str(msg.id))
+            else:
+                # Open file (w)
+                f = open(f"src/data/{service['service_id']}.txt", "w")
+                # Create message
+                channel = bot.get_guild(config.SERVER_ID).get_channel(
+                    config.SCHEDULES_CHANNEL_ID
+                )
+                msg = await channel.send(
+                    view=view,
+                    files=[
+                        discord.File(
+                            f"src/static/schedule-banners/{tv_services[service["service_id"]]["banner"]}"
+                        )
+                    ],
+                )
+                # Write message id to file
+                f.write(str(msg.id))
+
+        if service["service_id"] in radio_services.keys():
+            view = ui.LayoutView()
+            container = ui.Container()
+            container.add_item(
+                ui.MediaGallery(
+                    discord.MediaGalleryItem(
+                        f"attachment://{radio_services[service['service_id']]['banner']}"
+                    )
+                )
+            )
+            container.add_item(
+                ui.TextDisplay(
+                    f"# {radio_services[service['service_id']]['name']} Schedule for {now.day}/{now.month}/{now.year}"
+                )
+            )
+            events_full = service["events"]
+            events = service["events"][:30]
+            events_text = ""
+            for event in events:
+                events_text += f"{utils.dt_to_timestamp(datetime.fromisoformat(event['start_time']), "t")} [{event['main_title']}](https://bbc.co.uk/programmes/{event['program_id'].split('/')[-1]})\n"
+            if len(events_full) > len(events):
+                events_text += (
+                    f"**and {len(events_full) - len(events)} more entries...**"
+                )
+            container.add_item(ui.TextDisplay(events_text))
+            container.add_item(ui.Separator())
+            container.add_item(
+                ui.TextDisplay(
+                    f"-# Last updated: {utils.dt_to_timestamp(datetime.now(), "f")}"
+                )
+            )
+            container.add_item(
+                ui.Section(
+                    ui.TextDisplay("Full schedule:"),
+                    accessory=ui.Button(
+                        url=radio_services[service["service_id"]]["bbc"], label="Open"
+                    ),
+                )
+            )
+            container.add_item(ui.Separator())
+            container.add_item(
+                ui.TextDisplay(
+                    "-# **This feature is in beta!** Please report any bugs to valbuilded."
+                )
+            )
+            view.add_item(container)
+
+            if os.path.exists(f"src/data/{service['service_id']}.txt"):
+                # Open file (r)
+                f = open(f"src/data/{service['service_id']}.txt", "r")
+                # Find message
+                channel = (
+                    bot.get_guild(config.SERVER_ID)
+                    .get_channel(config.SCHEDULES_CHANNEL_ID)
+                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                )
+                try:
+                    message = await channel.fetch_message(f.read())
+                except:
+                    message = None
+                if message:
+                    # If message found: Edit message
+                    await message.edit(
+                        view=view,
+                    )
+                else:
+                    # Else: Create message
+                    msg = await channel.send(
+                        view=view,
+                        files=[
+                            discord.File(
+                                f"src/static/schedule-banners/{radio_services[service["service_id"]]["banner"]}"
+                            )
+                        ],
+                    )
+                    # Else: Open file (w)
+                    f = open(f"src/data/{service['service_id']}.txt", "w")
+                    # Else: Write message id to file
+                    f.write(str(msg.id))
+            else:
+                # Open file (w)
+                f = open(f"src/data/{service['service_id']}.txt", "w")
+                # Create message
+                channel = (
+                    bot.get_guild(config.SERVER_ID)
+                    .get_channel(config.SCHEDULES_CHANNEL_ID)
+                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                )
+                msg = await channel.send(
+                    view=view,
+                    files=[
+                        discord.File(
+                            f"src/static/schedule-banners/{radio_services[service["service_id"]]["banner"]}"
+                        )
+                    ],
+                )
+                # Write message id to file
+                f.write(str(msg.id))
+
+
 @bot.event
 async def on_ready() -> None:
     change_status.start()
     auto_move_specials.start()
-
     keep_supabase_alive.start()
+    update_scheules.start()
 
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
