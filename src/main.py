@@ -116,25 +116,25 @@ async def update_scheules():
 
     for service in data["data"]["programs"]:
         tv_services = {
-            "17536": {
-                "name": "BBC One London HD",
-                "banner": "one.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
-            },
-            "17472": {
-                "name": "BBC Two HD",
-                "banner": "two.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
+            "17920": {
+                "name": "BBC Three HD",
+                "banner": "three.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
             },
             "18048": {
                 "name": "BBC Four HD",
                 "banner": "four.png",
                 "bbc": "https://www.bbc.co.uk/schedules/p01kv81d",
             },
-            "17920": {
-                "name": "BBC Three HD",
-                "banner": "three.png",
-                "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
+            "17472": {
+                "name": "BBC Two HD",
+                "banner": "two.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
+            },
+            "17536": {
+                "name": "BBC One London HD",
+                "banner": "one.png",
+                "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
             },
             "4352": {
                 "name": "BBC News [UK]",
