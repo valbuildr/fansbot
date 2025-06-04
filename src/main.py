@@ -168,7 +168,9 @@ async def update_scheules():
     # Iterate over services in the order defined in the 'services' dict
     for service_id in services.keys():
         # Find the matching service data from the API response
-        service = next((s for s in data["data"]["programs"] if s["service_id"] == service_id), None)
+        service = next(
+            (s for s in data["data"]["programs"] if s["service_id"] == service_id), None
+        )
         if not service:
             continue
 
@@ -181,11 +183,7 @@ async def update_scheules():
                 )
             )
         )
-        container.add_item(
-            ui.TextDisplay(
-                f"# {services[service_id]['name']} Schedule for {now.day}/{now.month}/{now.year}"
-            )
-        )
+        container.add_item(ui.TextDisplay(f"# {services[service_id]['name']} Schedule"))
         events = service["events"]
         events_text = ""
         current_event = None
@@ -225,9 +223,7 @@ async def update_scheules():
         container.add_item(
             ui.Section(
                 ui.TextDisplay("Full schedule:"),
-                accessory=ui.Button(
-                    url=services[service_id]["bbc"], label="Open"
-                ),
+                accessory=ui.Button(url=services[service_id]["bbc"], label="Open"),
             )
         )
         container.add_item(ui.Separator())
