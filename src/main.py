@@ -291,7 +291,7 @@ async def update_scheules():
                 ui.Section(
                     ui.TextDisplay("Full schedule:"),
                     accessory=ui.Button(
-                        url=radio_services[service["service_id"]]["bbc"], label="Open"
+                        url=radio_services[service['service_id']]['bbc'], label="Open"
                     ),
                 )
             )
