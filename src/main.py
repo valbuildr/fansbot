@@ -345,32 +345,6 @@ async def on_message(message: discord.Message):
     if message.channel.id == config.polls_channel_id and message.poll != None:
         await message.create_thread(name=message.poll.question)
 
-    # censor bot bot
-    if (
-        message.author.id == 1091826653367386254
-        and message.content == ":pepeAngryPing:"
-    ):
-        await message.delete()
-
-    # even more bot bot censorship
-    censor_nax_change = True
-    if censor_nax_change:
-        if message.author.id == 1091826653367386254 and len(message.embeds) == 1:
-            if message.content == "<@&1174860300638507121>":
-                if message.embeds[0].title in [
-                    "News at One Moved",
-                    "News at Six Moved",
-                    "News at Ten Moved",
-                ]:
-                    if (
-                        message.embeds[0].description.startswith("NAO has moved to")
-                        or message.embeds[0].description.startswith("NAS has moved to")
-                        or message.embeds[0].description.startswith("NAT has moved to")
-                    ):
-                        await message.delete()
-                elif message.embeds[0].title == "New Program Detected":
-                    pass  # do nothing for now, this might be changed if i implement fans bot pinging a different role when bot bot detects a new programme
-
     await bot.process_commands(message)
 
 
