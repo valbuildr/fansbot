@@ -162,18 +162,25 @@ services = {
 }
 
 
-def format_schedule(service_id, service):
+def format_schedule(
+    banner_name: str,
+    channel_name: str,
+    events: list,
+    bbc_schedule_url: str,
+    channel_region: str | None = None,
+):
     now = datetime.now(timezone.utc)
 
     view = ui.LayoutView()
     container = ui.Container()
     container.add_item(
-        ui.MediaGallery(
-            discord.MediaGalleryItem(f"attachment://{services[service_id]['banner']}")
-        )
     )
-    container.add_item(ui.TextDisplay(f"# {services[service_id]['name']} Schedule"))
-    events = service["events"]
+    if channel_region:
+        container.add_item(
+            ui.TextDisplay(f"# {channel_name} [{channel_region}] Schedule")
+        )
+    else:
+        container.add_item(ui.TextDisplay(f"# {channel_name} Schedule"))
     events_text = ""
     # Find the index of the current event
     current_index = None
@@ -207,7 +214,7 @@ def format_schedule(service_id, service):
     container.add_item(
         ui.Section(
             ui.TextDisplay("Full schedule:"),
-            accessory=ui.Button(url=services[service_id]["bbc"], label="Open"),
+            accessory=ui.Button(url=bbc_schedule_url, label="Open"),
         )
     )
     container.add_item(ui.Separator())
@@ -242,7 +249,13 @@ async def update_scheules():
         if not service:
             continue
 
-        view = format_schedule(service_id, service)
+        view = format_schedule(
+            services[service_id]["banner"],
+            services[service_id]["name"],
+            service["events"],
+            services[service_id]["bbc"],
+            services[service_id]["region"],
+        )
 
         if os.path.exists(f"src/data/{service_id}.txt"):
             # Open file (r)
