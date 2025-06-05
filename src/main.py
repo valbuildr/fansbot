@@ -104,28 +104,28 @@ async def keep_supabase_alive():
 
 services = {
     "18048": {
-        "name": "BBC Four HD",
+        "name": "BBC Four",
         "region": None,
         "banner": "four.png",
         "bbc": "https://www.bbc.co.uk/schedules/p01kv81d",
         "type": "tv",
     },
     "17920": {
-        "name": "BBC Three HD",
+        "name": "BBC Three",
         "region": None,
         "banner": "three.png",
         "bbc": "https://www.bbc.co.uk/schedules/p01kv7xf",
         "type": "tv",
     },
     "17472": {
-        "name": "BBC Two HD",
+        "name": "BBC Two",
         "region": None,
         "banner": "two.png",
         "bbc": "https://www.bbc.co.uk/schedules/p015pksy",
         "type": "tv",
     },
     "17536": {
-        "name": "BBC One HD",
+        "name": "BBC One",
         "region": "London",
         "banner": "one.png",
         "bbc": "https://www.bbc.co.uk/schedules/p00fzl6p",
@@ -321,6 +321,405 @@ async def update_scheules():
             f.write(str(msg.id))
 
 
+tv_regions = {
+    "64334": {
+        "name": "Channel Islands",
+        "one": ["17550", "https://www.bbc.co.uk/schedules/p00fzl6j", "Channel Islands"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64304": {
+        "name": "East",
+        "one": ["17543", "https://www.bbc.co.uk/schedules/p00fzl6k", "East"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64345": {
+        "name": "East Midlands",
+        "one": ["17542", "https://www.bbc.co.uk/schedules/p00fzl6l", "East Midlands"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64257": {
+        "name": "London",
+        "one": ["17536", "https://www.bbc.co.uk/schedules/p00fzl6p", "London"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64369": {
+        "name": "North East & Cumbria",
+        "one": [
+            "17545",
+            "https://www.bbc.co.uk/schedules/p00fzl6r",
+            "North East & Cumbria",
+        ],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64369": {
+        "name": "North West",
+        "one": ["17544", "https://www.bbc.co.uk/schedules/p00fzl6s", "North West"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64425": {
+        "name": "Northern Ireland",
+        "one": [
+            "17597",
+            "https://www.bbc.co.uk/schedules/p00zskxc",
+            "Northern Ireland",
+        ],
+        "two": [
+            "17533",
+            "https://www.bbc.co.uk/schedules/p06ngcbm",
+            "Northern Ireland",
+        ],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64405": {
+        "name": "Scotland",
+        "one": ["17596", "https://www.bbc.co.uk/schedules/p013blmc", "Scotland"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", "Scotland"],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64273": {
+        "name": "South",
+        "one": ["17539", "https://www.bbc.co.uk/schedules/p00fzl6w", "South"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64280": {
+        "name": "South East",
+        "one": ["17548", "https://www.bbc.co.uk/schedules/p00fzl6x", "South East"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64328": {
+        "name": "South West",
+        "one": ["17538", "https://www.bbc.co.uk/schedules/p00fzl6y", "South West"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64417": {
+        "name": "Wales",
+        "one": ["17598", "https://www.bbc.co.uk/schedules/p013bkc7", "Wales"],
+        "two": ["17534", "https://www.bbc.co.uk/schedules/p06ngc52", "Wales"],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64321": {
+        "name": "West",
+        "one": ["17537", "https://www.bbc.co.uk/schedules/p00fzl70", "West"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64337": {
+        "name": "West Midlands",
+        "one": ["17541", "https://www.bbc.co.uk/schedules/p00fzl71", "West Midlands"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64353": {
+        "name": "Yorkshire & Lincolnshire",
+        "one": [
+            "64353",
+            "https://www.bbc.co.uk/schedules/p00fzl6m",
+            "Yorkshire & Lincolnshire",
+        ],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+    "64363": {
+        "name": "Yorkshire",
+        "one": ["17546", "https://www.bbc.co.uk/schedules/p00fzl72", "East"],
+        "two": ["17472", "https://www.bbc.co.uk/schedules/p015pksy", None],
+        "three": ["17920", "https://www.bbc.co.uk/schedules/p01kv7xf", None],
+        "four": ["18048", "https://www.bbc.co.uk/schedules/p01kv81d", None],
+        "cbbc": ["18112", "https://www.bbc.co.uk/schedules/p01kv86b", None],
+        "cbeebies": ["18176", "https://www.bbc.co.uk/schedules/p01kv8yz", None],
+        "news": ["4352", "https://www.bbc.co.uk/schedules/p00fzl6g", "UK"],
+        "parliament": ["4736", "https://www.bbc.co.uk/schedules/p00fzl73", None],
+    },
+}
+
+
+national_radios = {
+    "6720": {
+        "name": "BBC Radio 1",
+        "region": None,
+        "banner": "1.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl86",
+    },
+    "5888": {
+        "name": "BBC Radio 1 Xtra",
+        "region": None,
+        "banner": "1x.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl64",
+    },
+    "6784": {
+        "name": "BBC Radio 2",
+        "region": None,
+        "banner": "2.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl8v",
+    },
+    "6848": {
+        "name": "BBC Radio 3",
+        "region": None,
+        "banner": "3.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl8t",
+    },
+    "6912": {
+        "name": "BBC Radio 4",
+        "region": None,
+        "banner": "4.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl7j",
+    },
+    "5632": {
+        "name": "BBC Radio 5 Live",
+        "region": None,
+        "banner": "5.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl7g",
+    },
+    "5696": {
+        "name": "BBC Radio 5 Sports Extra",
+        "region": None,
+        "banner": "5x.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl7h",
+    },
+    "5760": {
+        "name": "BBC Radio 6 Music",
+        "region": None,
+        "banner": "6.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl65",
+    },
+    "5824": {
+        "name": "BBC Radio 4 Extra",
+        "region": None,
+        "banner": "4x.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl7l",
+    },
+    "5952": {
+        "name": "BBC Asian Network",
+        "region": None,
+        "banner": "asian.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p00fzl68",
+    },
+    "6016": {
+        "name": "BBC World Service",
+        "region": "UK DAB/Freeview",
+        "banner": "worldservice.png",
+        "schedule": "https://www.bbc.co.uk/schedules/p02zbmb3",
+    },
+}
+
+
+async def tv_region_autocomplete(
+    interaction: discord.Interaction, current: str
+) -> list[discord.app_commands.Choice[str]]:
+    return [
+        discord.app_commands.Choice(name=region["name"], value=region_id)
+        for region_id, region in tv_regions.items()
+        if current.lower() in region["name"].lower()
+    ]
+
+
+async def radio_autocomplete(
+    interaction: discord.Interaction, current: str
+) -> list[discord.app_commands.Choice[str]]:
+    return [
+        discord.app_commands.Choice(name=network["name"], value=network_id)
+        for network_id, network in national_radios.items()
+        if current.lower() in network["name"].lower()
+    ]
+
+
+class ScheduleCommands(discord.app_commands.Group):
+    @discord.app_commands.command(
+        name="tv", description="Get the schedule for a BBC TV service."
+    )
+    @discord.app_commands.choices(
+        channel=[
+            discord.app_commands.Choice(name="BBC One HD", value="one"),
+            discord.app_commands.Choice(name="BBC Two HD", value="two"),
+            discord.app_commands.Choice(name="BBC Three HD", value="three"),
+            discord.app_commands.Choice(name="BBC Four HD", value="four"),
+            discord.app_commands.Choice(name="CBBC HD", value="cbbc"),
+            discord.app_commands.Choice(name="CBeebies HD", value="cbeebies"),
+            discord.app_commands.Choice(name="BBC News", value="news"),
+            discord.app_commands.Choice(name="BBC Parliament", value="parliament"),
+        ]
+    )
+    @discord.app_commands.autocomplete(region=tv_region_autocomplete)
+    async def tv(
+        self, interaction: discord.Interaction, channel: str, region: str = "64257"
+    ):
+        await interaction.response.defer()
+
+        now = datetime.now(timezone.utc)
+        midnight_utc = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        request = requests.get(
+            "https://www.freeview.co.uk/api/tv-guide",
+            params={"nid": region, "start": utils.dt_to_timestamp(midnight_utc, "a")},
+        )
+
+        data = request.json()
+
+        # Default to London
+        if region not in tv_regions.keys():
+            region = "64257"
+
+        meta = tv_regions[region]
+
+        service = next(
+            (
+                s
+                for s in data["data"]["programs"]
+                if s["service_id"] == meta[channel][0]
+            ),
+            None,
+        )
+
+        channel_names = {
+            "one": "BBC One",
+            "two": "BBC Two",
+            "three": "BBC Three",
+            "four": "BBC Four",
+            "cbbc": "CBBC",
+            "cbeebies": "Cbeebies",
+            "news": "BBC News",
+            "parliament": "BBC Parliament",
+        }
+
+        view = format_schedule(
+            f"{channel}.png",
+            channel_names[channel],
+            service["events"],
+            meta[channel][1],
+            meta[channel][2],
+        )
+
+        await interaction.followup.send(
+            view=view,
+            files=[discord.File(f"src/static/schedule-banners/{channel}.png")],
+        )
+
+    @discord.app_commands.command(
+        name="national-radio",
+        description="Get the schedule for a national BBC Radio service.",
+    )
+    @discord.app_commands.autocomplete(network=radio_autocomplete)
+    async def radio(self, interaction: discord.Interaction, network: str):
+        await interaction.response.defer()
+
+        now = datetime.now(timezone.utc)
+        midnight_utc = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        request = requests.get(
+            "https://www.freeview.co.uk/api/tv-guide",
+            params={"nid": "64257", "start": utils.dt_to_timestamp(midnight_utc, "a")},
+        )
+
+        data = request.json()
+
+        # Default to World Service
+        if network not in national_radios.keys():
+            network = "6016"
+
+        meta = national_radios[network]
+
+        service = next(
+            (s for s in data["data"]["programs"] if s["service_id"] == network)
+        )
+
+        view = format_schedule(
+            meta["banner"],
+            meta["name"],
+            service["events"],
+            meta["schedule"],
+            meta["region"],
+        )
+
+        await interaction.followup.send(
+            view=view,
+            files=[discord.File(f"src/static/schedule-banners/{meta["banner"]}")],
+        )
+
+
 @bot.event
 async def on_ready() -> None:
     change_status.start()
@@ -330,6 +729,10 @@ async def on_ready() -> None:
 
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
+
+    bot.tree.add_command(
+        ScheduleCommands(name="schedule", description="Schedule commands")
+    )
 
     log.info(f"Logged in as {bot.user.name}")
 
