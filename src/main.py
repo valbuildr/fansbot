@@ -174,6 +174,7 @@ def format_schedule(
     view = ui.LayoutView()
     container = ui.Container()
     container.add_item(
+        ui.MediaGallery(discord.MediaGalleryItem(f"attachment://{banner_name}"))
     )
     if channel_region:
         container.add_item(
