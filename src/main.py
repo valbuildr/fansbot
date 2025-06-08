@@ -716,7 +716,7 @@ class ScheduleCommands(discord.app_commands.Group):
 
         await interaction.followup.send(
             view=view,
-            files=[discord.File(f"src/static/schedule-banners/{meta["banner"]}")],
+            files=[discord.File(f"src/static/schedule-banners/{meta['banner']}")],
         )
 
 
