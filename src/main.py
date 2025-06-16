@@ -729,6 +729,7 @@ async def on_ready() -> None:
 
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
+    await bot.load_extension("ext.games")
 
     bot.tree.add_command(
         ScheduleCommands(name="schedule", description="Schedule commands")
