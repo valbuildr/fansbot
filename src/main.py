@@ -13,6 +13,7 @@ import git
 import utils
 from logging import getLogger
 from discord import ui
+from discord import app_commands as appcmds
 
 log = getLogger("discord.fansbot")
 
@@ -589,9 +590,9 @@ national_radios = {
 
 async def tv_region_autocomplete(
     interaction: discord.Interaction, current: str
-) -> list[discord.app_commands.Choice[str]]:
+) -> list[appcmds.Choice[str]]:
     return [
-        discord.app_commands.Choice(name=region["name"], value=region_id)
+        appcmds.Choice(name=region["name"], value=region_id)
         for region_id, region in tv_regions.items()
         if current.lower() in region["name"].lower()
     ]
@@ -599,31 +600,29 @@ async def tv_region_autocomplete(
 
 async def radio_autocomplete(
     interaction: discord.Interaction, current: str
-) -> list[discord.app_commands.Choice[str]]:
+) -> list[appcmds.Choice[str]]:
     return [
-        discord.app_commands.Choice(name=network["name"], value=network_id)
+        appcmds.Choice(name=network["name"], value=network_id)
         for network_id, network in national_radios.items()
         if current.lower() in network["name"].lower()
     ]
 
 
-class ScheduleCommands(discord.app_commands.Group):
-    @discord.app_commands.command(
-        name="tv", description="Get the schedule for a BBC TV service."
-    )
-    @discord.app_commands.choices(
+class ScheduleCommands(appcmds.Group):
+    @appcmds.command(name="tv", description="Get the schedule for a BBC TV service.")
+    @appcmds.choices(
         channel=[
-            discord.app_commands.Choice(name="BBC One HD", value="one"),
-            discord.app_commands.Choice(name="BBC Two HD", value="two"),
-            discord.app_commands.Choice(name="BBC Three HD", value="three"),
-            discord.app_commands.Choice(name="BBC Four HD", value="four"),
-            discord.app_commands.Choice(name="CBBC HD", value="cbbc"),
-            discord.app_commands.Choice(name="CBeebies HD", value="cbeebies"),
-            discord.app_commands.Choice(name="BBC News", value="news"),
-            discord.app_commands.Choice(name="BBC Parliament", value="parliament"),
+            appcmds.Choice(name="BBC One HD", value="one"),
+            appcmds.Choice(name="BBC Two HD", value="two"),
+            appcmds.Choice(name="BBC Three HD", value="three"),
+            appcmds.Choice(name="BBC Four HD", value="four"),
+            appcmds.Choice(name="CBBC HD", value="cbbc"),
+            appcmds.Choice(name="CBeebies HD", value="cbeebies"),
+            appcmds.Choice(name="BBC News", value="news"),
+            appcmds.Choice(name="BBC Parliament", value="parliament"),
         ]
     )
-    @discord.app_commands.autocomplete(region=tv_region_autocomplete)
+    @appcmds.autocomplete(region=tv_region_autocomplete)
     async def tv(
         self, interaction: discord.Interaction, channel: str, region: str = "64257"
     ):
@@ -678,11 +677,11 @@ class ScheduleCommands(discord.app_commands.Group):
             files=[discord.File(f"src/static/schedule-banners/{channel}.png")],
         )
 
-    @discord.app_commands.command(
+    @appcmds.command(
         name="national-radio",
         description="Get the schedule for a national BBC Radio service.",
     )
-    @discord.app_commands.autocomplete(network=radio_autocomplete)
+    @appcmds.autocomplete(network=radio_autocomplete)
     async def radio(self, interaction: discord.Interaction, network: str):
         await interaction.response.defer()
 
@@ -846,7 +845,7 @@ async def sync(ctx: commands.Context) -> None:
 
 
 @bot.tree.command(name="rules", description="Gets the server rules!")
-@discord.app_commands.guild_only()
+@appcmds.guild_only()
 async def rules(interaction: discord.Interaction) -> None:
     f = open("./src/data/rules.txt", "r")
     rules = f.read()
@@ -858,16 +857,14 @@ async def rules(interaction: discord.Interaction) -> None:
 @bot.tree.command(
     name="view-message-file", description="MOD ONLY: View a message file."
 )
-@discord.app_commands.choices(
+@appcmds.choices(
     file=[
-        discord.app_commands.Choice(name="Rules", value="rules.txt"),
-        discord.app_commands.Choice(
-            name="Receive Member Role", value="receive_member_role.txt"
-        ),
-        discord.app_commands.Choice(name="Ticket Message", value="ticket_message.txt"),
+        appcmds.Choice(name="Rules", value="rules.txt"),
+        appcmds.Choice(name="Receive Member Role", value="receive_member_role.txt"),
+        appcmds.Choice(name="Ticket Message", value="ticket_message.txt"),
     ]
 )
-@discord.app_commands.describe(
+@appcmds.describe(
     file="The file to view.", raw="If you want the raw contents, set this to True."
 )
 async def view_message_file(interaction: discord.Interaction, file: str, raw: bool):
