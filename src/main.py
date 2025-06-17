@@ -14,6 +14,7 @@ import utils
 from logging import getLogger
 from discord import ui
 from discord import app_commands as appcmds
+import json
 
 log = getLogger("discord.fansbot")
 
@@ -259,31 +260,66 @@ async def update_scheules():
             services[service_id]["region"],
         )
 
-        if os.path.exists(f"src/data/{service_id}.txt"):
-            # Open file (r)
-            f = open(f"src/data/{service_id}.txt", "r")
-            # Find message
-            if services[service_id]["type"] == "radio":
-                channel = (
-                    bot.get_guild(config.SERVER_ID)
-                    .get_channel(config.SCHEDULES_CHANNEL_ID)
-                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
-                )
+        if os.path.exists(f"src/data/{service_id}.json"):
+            file = json.load(open(f"src/data/{service_id}.json", "r"))
+        else:
+            json.dump(
+                {"event": service["events"]}, open(f"src/data/{service_id}.json", "w")
+            )
+            file = open(f"src/data/{service_id}.json", "r").read()
+
+        if file != {"event": service["events"]}:
+            if os.path.exists(f"src/data/{service_id}.txt"):
+                # Open file (r)
+                f = open(f"src/data/{service_id}.txt", "r")
+                # Find message
+                if services[service_id]["type"] == "radio":
+                    channel = (
+                        bot.get_guild(config.SERVER_ID)
+                        .get_channel(config.SCHEDULES_CHANNEL_ID)
+                        .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                    )
+                else:
+                    channel = bot.get_guild(config.SERVER_ID).get_channel(
+                        config.SCHEDULES_CHANNEL_ID
+                    )
+                try:
+                    message = await channel.fetch_message(f.read())
+                except:
+                    message = None
+                if message:
+                    # If message found: Edit message
+                    await message.edit(
+                        view=view,
+                    )
+                else:
+                    # Else: Create message
+                    msg = await channel.send(
+                        view=view,
+                        files=[
+                            discord.File(
+                                f"src/static/schedule-banners/{services[service_id]['banner']}"
+                            )
+                        ],
+                    )
+                    # Else: Open file (w)
+                    f = open(f"src/data/{service_id}.txt", "w")
+                    # Else: Write message id to file
+                    f.write(str(msg.id))
             else:
-                channel = bot.get_guild(config.SERVER_ID).get_channel(
-                    config.SCHEDULES_CHANNEL_ID
-                )
-            try:
-                message = await channel.fetch_message(f.read())
-            except:
-                message = None
-            if message:
-                # If message found: Edit message
-                await message.edit(
-                    view=view,
-                )
-            else:
-                # Else: Create message
+                # Open file (w)
+                f = open(f"src/data/{service_id}.txt", "w")
+                # Create message
+                if services[service_id]["type"] == "radio":
+                    channel = (
+                        bot.get_guild(config.SERVER_ID)
+                        .get_channel(config.SCHEDULES_CHANNEL_ID)
+                        .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
+                    )
+                else:
+                    channel = bot.get_guild(config.SERVER_ID).get_channel(
+                        config.SCHEDULES_CHANNEL_ID
+                    )
                 msg = await channel.send(
                     view=view,
                     files=[
@@ -292,34 +328,8 @@ async def update_scheules():
                         )
                     ],
                 )
-                # Else: Open file (w)
-                f = open(f"src/data/{service_id}.txt", "w")
-                # Else: Write message id to file
+                # Write message id to file
                 f.write(str(msg.id))
-        else:
-            # Open file (w)
-            f = open(f"src/data/{service_id}.txt", "w")
-            # Create message
-            if services[service_id]["type"] == "radio":
-                channel = (
-                    bot.get_guild(config.SERVER_ID)
-                    .get_channel(config.SCHEDULES_CHANNEL_ID)
-                    .get_thread(config.RADIO_SCHEDULES_THREAD_ID)
-                )
-            else:
-                channel = bot.get_guild(config.SERVER_ID).get_channel(
-                    config.SCHEDULES_CHANNEL_ID
-                )
-            msg = await channel.send(
-                view=view,
-                files=[
-                    discord.File(
-                        f"src/static/schedule-banners/{services[service_id]['banner']}"
-                    )
-                ],
-            )
-            # Write message id to file
-            f.write(str(msg.id))
 
 
 tv_regions = {
