@@ -113,6 +113,7 @@ class TicketCommands(appcmds.Group):
         if (
             interaction.channel.category.id == config.ticket_category_id
             and interaction.channel.name.startswith("ticket-")
+            and interaction.guild.get_role(config.MOD_ROLE_ID) in interaction.user.roles
         ):
             overwrites = list(interaction.channel.overwrites.keys())
 
@@ -157,6 +158,7 @@ class TicketCommands(appcmds.Group):
         if (
             interaction.channel.category.id == config.ticket_category_id
             and interaction.channel.name.startswith("ticket-")
+            and interaction.guild.get_role(config.MOD_ROLE_ID) in interaction.user.roles
         ):
             overwrites = list(interaction.channel.overwrites.keys())
 
@@ -198,6 +200,7 @@ class TicketCommands(appcmds.Group):
         if (
             interaction.channel.category.id == config.ticket_category_id
             and interaction.channel.name.startswith("ticket-")
+            and interaction.guild.get_role(config.MOD_ROLE_ID) in interaction.user.roles
         ):
             if user.id == interaction.user.id:
                 await interaction.response.send_message(
@@ -232,6 +235,7 @@ class TicketCommands(appcmds.Group):
         if (
             interaction.channel.category.id == config.ticket_category_id
             and interaction.channel.name.startswith("ticket-")
+            and interaction.guild.get_role(config.MOD_ROLE_ID) in interaction.user.roles
         ):
             if role.id == config.MOD_ROLE_ID:
                 await interaction.response.send_message(
