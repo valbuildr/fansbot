@@ -60,6 +60,7 @@ async def change_status():
         discord.CustomActivity(name="Keeping up with the BBC"),
         discord.CustomActivity(name="beep boop beep"),
         discord.CustomActivity(name="Now hosted entirely in the UK!"),
+        discord.CustomActivity(name="i use arch btw"),
     ]
 
     chosen = choice(statuses)
