@@ -29,21 +29,24 @@ class TicketCommands(appcmds.Group):
                     f'ticket-{utils.dt_to_timestamp(datetime.now(), "a")}',
                     overwrites={
                         interaction.user: discord.PermissionOverwrite(
+                            view_channel=True,
                             read_messages=True,
                             send_messages=True,
                             attach_files=True,
                             embed_links=True,
                         ),
                         guild.default_role: discord.PermissionOverwrite(
-                            read_messages=False
+                            view_channel=False, read_messages=False
                         ),
                         mod_role: discord.PermissionOverwrite(
+                            view_channel=True,
                             read_messages=True,
                             send_messages=True,
                             attach_files=True,
                             embed_links=True,
                         ),
                         interaction.client.user: discord.PermissionOverwrite(
+                            view_channel=True,
                             read_messages=True,
                             send_messages=True,
                             attach_files=True,
@@ -90,7 +93,7 @@ class TicketCommands(appcmds.Group):
                     await interaction.channel.set_permissions(
                         overwrite,
                         overwrite=discord.PermissionOverwrite(
-                            read_messages=True, send_messages=False
+                            view_channel=False, read_messages=True, send_messages=False
                         ),
                     )
 
@@ -130,6 +133,7 @@ class TicketCommands(appcmds.Group):
                 await interaction.channel.set_permissions(
                     user,
                     overwrite=discord.PermissionOverwrite(
+                        view_channel=True,
                         read_messages=True,
                         send_messages=True,
                         attach_files=True,
@@ -175,6 +179,7 @@ class TicketCommands(appcmds.Group):
                 await interaction.channel.set_permissions(
                     role,
                     overwrite=discord.PermissionOverwrite(
+                        view_channel=True,
                         read_messages=True,
                         send_messages=True,
                         attach_files=True,
@@ -216,6 +221,7 @@ class TicketCommands(appcmds.Group):
                 await interaction.channel.set_permissions(
                     user,
                     overwrite=discord.PermissionOverwrite(
+                        view_channel=False,
                         read_messages=False,
                         send_messages=False,
                     ),
@@ -246,6 +252,7 @@ class TicketCommands(appcmds.Group):
                 await interaction.channel.set_permissions(
                     role,
                     overwrite=discord.PermissionOverwrite(
+                        view_channel=False,
                         read_messages=False,
                         send_messages=False,
                     ),
