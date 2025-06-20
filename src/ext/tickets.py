@@ -104,7 +104,7 @@ class TicketCommands(appcmds.Group):
             ticketid = interaction.channel.name.split("-")[1]
             await interaction.channel.edit(name=f"closed-{ticketid}")
 
-    @appcmds.command(name="add-user", description="Mod: Add a user to ticket.")
+    @appcmds.command(name="add-user", description="Mod: Add a user to a ticket.")
     @appcmds.describe(
         user="The user to add to the ticket.",
         ping="Ping the user or not. Defaults to True.",
@@ -150,7 +150,7 @@ class TicketCommands(appcmds.Group):
                         allowed_mentions=discord.AllowedMentions.none(),
                     )
 
-    @appcmds.command(name="add-role", description="Mod: Add a role to ticket.")
+    @appcmds.command(name="add-role", description="Mod: Add a role a to ticket.")
     @appcmds.describe(
         role="The role to add to the ticket.",
         ping="Ping the role or not. Defaults to False.",
