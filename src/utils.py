@@ -57,10 +57,7 @@ class Pagination(discord.ui.View):
         super().__init__(timeout=100)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user == self.interaction.user:
-            return True
-        else:
-            return False
+        return interaction.user == self.interaction.user
 
     async def navegate(self):
         emb, self.total_pages = await self.get_page(self.index)
