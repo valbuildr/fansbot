@@ -866,6 +866,77 @@ async def rules(interaction: discord.Interaction) -> None:
 
 
 @bot.tree.command(
+    name="messages",
+    description="Mod: Gets the conversation between the bot and a user.",
+)
+@appcmds.describe(user="The user.")
+async def messages(interaction: discord.Interaction, user: discord.User):
+    await user.create_dm()
+    if user.dm_channel:
+        await interaction.response.defer()
+        L = 5
+        messages = [message async for message in user.history(limit=200)]
+        print(messages)
+
+        # create pagination
+        async def get_page(page: int):
+            emb = discord.Embed(
+                title=f"Messages with {user.name}", colour=discord.Color.blue()
+            )
+            offset = (page - 1) * L
+
+            for item in messages[offset : offset + L]:
+                content = item.content.replace("\n", "\n> ")
+                if len(content) > 512:
+                    content = content[:509] + "..."
+                v = f"> {content}"
+
+                if len(item.attachments) >= 1:
+                    v += f"\nplus {len(item.attachments)} attachment(s)"
+                if len(item.embeds) >= 1:
+                    v += f"\nplus {len(item.embeds)} embed(s)"
+
+                emb.add_field(
+                    name=f"{item.id} - {item.author.name}", value=v, inline=False
+                )
+            n = utils.Pagination.compute_total_pages(len(messages), L)
+            emb.set_footer(
+                text=f"Page {page}/{n} • For more information on a message, run /message-info."
+            )
+            return emb, n
+
+        await utils.Pagination(interaction, get_page).navegate()
+
+    else:
+        await interaction.response.send_message(
+            content=f"There are no messages between the bot and {user.mention}.",
+            ephemeral=False,
+        )
+
+
+@bot.tree.command(
+    name="message-info",
+    description="Mod: Gets more info on a specific direct message to/from the bot.",
+)
+@appcmds.describe(user="The user.", message_id="The message ID.")
+async def message_info(
+    interaction: discord.Interaction, user: discord.User, message_id: str
+):
+    msg = await user.fetch_message(message_id)
+    if msg:
+        c = f"> {msg.content.replace("\n", "\n> ")}\n\- {user.mention}\n"
+        if len(msg.attachments) >= 1:
+            c += "## Attachments"
+            for att in msg.attachments:
+                c += f"\n{att.url}"
+        await interaction.response.send_message(content=c, embeds=msg.embeds)
+    else:
+        await interaction.response.send_message(
+            content="There is no message with that user that has that ID."
+        )
+
+
+@bot.tree.command(
     name="view-message-file", description="MOD ONLY: View a message file."
 )
 @appcmds.choices(
