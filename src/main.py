@@ -637,7 +637,7 @@ class ScheduleCommands(appcmds.Group):
     async def tv(
         self, interaction: discord.Interaction, channel: str, region: str = "64257"
     ):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
 
         now = datetime.now(timezone.utc)
         midnight_utc = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -686,7 +686,6 @@ class ScheduleCommands(appcmds.Group):
         await interaction.followup.send(
             view=view,
             files=[discord.File(f"src/static/schedule-banners/{channel}.png")],
-            ephemeral=True
         )
 
     @appcmds.command(
@@ -695,7 +694,7 @@ class ScheduleCommands(appcmds.Group):
     )
     @appcmds.autocomplete(network=radio_autocomplete)
     async def radio(self, interaction: discord.Interaction, network: str):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
 
         now = datetime.now(timezone.utc)
         midnight_utc = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -728,7 +727,6 @@ class ScheduleCommands(appcmds.Group):
         await interaction.followup.send(
             view=view,
             files=[discord.File(f"src/static/schedule-banners/{meta['banner']}")],
-            ephemeral=True
         )
 
 
