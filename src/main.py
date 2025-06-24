@@ -686,6 +686,7 @@ class ScheduleCommands(appcmds.Group):
         await interaction.followup.send(
             view=view,
             files=[discord.File(f"src/static/schedule-banners/{channel}.png")],
+            ephemeral=True
         )
 
     @appcmds.command(
@@ -727,6 +728,7 @@ class ScheduleCommands(appcmds.Group):
         await interaction.followup.send(
             view=view,
             files=[discord.File(f"src/static/schedule-banners/{meta['banner']}")],
+            ephemeral=True
         )
 
 
