@@ -1082,13 +1082,6 @@ async def update_message_file(
 
 
 @bot.command()
-async def birthday(ctx: commands.Context):
-    async with ctx.typing():
-        await ctx.send(file=discord.File("./src/static/birthday.mp4"))
-        return
-
-
-@bot.command()
 async def bbcd(ctx: commands.Context) -> None:
     async with ctx.typing():
         release_info = requests.get(
