@@ -755,9 +755,68 @@ async def on_member_join(member: discord.Member):
 
 
 @bot.event
+async def on_thread_update(before: discord.Thread, after: discord.Thread):
+    if before.locked == False and after.locked == True:
+        if after.parent.id in [config.MOCKS_CHANNEL_ID, config.OTHER_CATEGORY_ID]:
+            e = discord.Embed(
+                title="This post has been locked by a moderator.",
+                color=discord.Color.blue(),
+            )
+            e.add_field(
+                name="Moderator Note",
+                value="*A moderator has not yet added a note onto this closure.*\n-# If you are a moderator and would like to add a note, just reply to this message and I'll add it here.",
+            )
+            e.timestamp = datetime.now()
+            match after.parent.id:
+                case config.MOCKS_CHANNEL_ID:
+                    e.description = "Common reasons for this action in this channel are:\n- This mock does not meet the effort requirement.\n- This mock is not mady by the poster, and was credit was not properly given to the original creator."
+                case config.OTHER_TV_CHANNEL_ID:
+                    e.description = "Common reasons for this action in this channel are:\n- A simillar post already exists."
+
+            await after.send(embed=e)
+
+
+@bot.event
 async def on_message(message: discord.Message):
     if message.channel.id == config.polls_channel_id and message.poll != None:
         await message.create_thread(name=message.poll.question)
+
+    if (
+        message.channel.type == discord.ChannelType.public_thread
+        and message.channel.parent.id
+        in [config.MOCKS_CHANNEL_ID, config.OTHER_CATEGORY_ID]
+        and bot.get_guild(config.GUILD_ID).get_role(config.MOD_ROLE_ID)
+        in message.author.roles
+        and message.channel.locked
+        and message.type == discord.MessageType.reply
+    ):
+        await message.add_reaction("🔍")
+        lock_msg = await message.channel.fetch_message(message.reference.message_id)
+        if (
+            lock_msg.author == bot.user
+            and len(lock_msg.embeds) == 1
+            and lock_msg.embeds[0].title == "This post has been locked by a moderator."
+        ):
+            e = lock_msg.embeds[0]
+            new_embed = discord.Embed(
+                title=e.title,
+                description=e.description,
+                color=e.color,
+                timestamp=e.timestamp,
+            )
+            new_embed.add_field(
+                name=e.fields[0].name,
+                value=f"> {message.content} \n\\- {message.author.mention} {utils.dt_to_timestamp(message.created_at, 'f')}",
+            )
+            print(new_embed.fields[0].value)
+
+            await lock_msg.edit(embed=new_embed)
+
+            await message.remove_reaction("🔍", bot.user)
+            await message.add_reaction("✅")
+        else:
+            await message.remove_reaction("🔍", bot.user)
+            await message.add_reaction("❌")
 
     await bot.process_commands(message)
 
@@ -924,7 +983,7 @@ async def message_info(
 ):
     msg = await user.fetch_message(message_id)
     if msg:
-        c = f"> {msg.content.replace("\n", "\n> ")}\n\- {user.mention}\n"
+        c = f"> {msg.content.replace("\n", "\n> ")}\n\\- {user.mention}\n"
         if len(msg.attachments) >= 1:
             c += "## Attachments"
             for att in msg.attachments:
