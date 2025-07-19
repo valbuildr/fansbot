@@ -1081,16 +1081,6 @@ async def update_message_file(
     )
 
 
-@bot.command(name="version")
-async def version(ctx: commands.Context) -> None:
-    local_repo = git.Repo(search_parent_directories=True)
-    last_local_sha = local_repo.head.object.hexsha
-
-    cont = f"Last local commit: [`{last_local_sha[:7]}`](<{config.source_code_link}/commit/{last_local_sha}>)\nSource code: <{config.source_code_link}>"
-
-    await ctx.send(content=cont)
-
-
 @bot.command()
 async def tada(ctx: commands.Context) -> None:
     async with ctx.typing():
