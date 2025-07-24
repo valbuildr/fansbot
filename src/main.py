@@ -750,8 +750,28 @@ async def on_ready() -> None:
 
 @bot.event
 async def on_member_join(member: discord.Member):
-    if member.guild.id == config.server_id:
+    if member.guild.id == config.SERVER_ID:
         await member.add_roles(discord.Object(id=config.unverified_role_id))
+
+        welcome_channel = bot.get_guild(config.SERVER_ID).get_channel(
+            config.NEW_MEMBERS_CHANNEL_ID
+        )
+
+        await welcome_channel.send(
+            content=f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, "D")} ({utils.dt_to_timestamp(member.created_at, "R")})\n-# ID: {member.id}"
+        )
+
+
+@bot.event
+async def on_member_remove(member: discord.Member):
+    if member.guild.id == config.SERVER_ID:
+        welcome_channel = bot.get_guild(config.SERVER_ID).get_channel(
+            config.NEW_MEMBERS_CHANNEL_ID
+        )
+
+        await welcome_channel.send(
+            content=f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {member.joined_at}]"
+        )
 
 
 @bot.event
