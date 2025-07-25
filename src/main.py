@@ -783,7 +783,7 @@ async def on_member_remove(member: discord.Member):
         welcome_view.add_item(
             discord.ui.Container(
                 discord.ui.TextDisplay(
-                    f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {member.joined_at}]"
+                    f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {utils.dt_to_timestamp(member.joined_at, "R")}]"
                 ),
                 accent_color=discord.Color.red()
             )
