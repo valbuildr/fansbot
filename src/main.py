@@ -740,6 +740,7 @@ async def on_ready() -> None:
     await bot.load_extension("ext.tickets")
     await bot.load_extension("ext.moderation")
     await bot.load_extension("ext.games")
+    await bot.load_extension("ext.glossary")
 
     bot.tree.add_command(
         ScheduleCommands(name="schedule", description="Schedule commands")
@@ -763,13 +764,11 @@ async def on_member_join(member: discord.Member):
                 discord.ui.TextDisplay(
                     f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, "D")} ({utils.dt_to_timestamp(member.created_at, "R")})\n-# ID: {member.id}"
                 ),
-                accent_color=discord.Color.green()
+                accent_color=discord.Color.green(),
             )
         )
 
-        await welcome_channel.send(
-            view=welcome_view
-        )
+        await welcome_channel.send(view=welcome_view)
 
 
 @bot.event
@@ -785,13 +784,11 @@ async def on_member_remove(member: discord.Member):
                 discord.ui.TextDisplay(
                     f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {utils.dt_to_timestamp(member.joined_at, "R")}]"
                 ),
-                accent_color=discord.Color.red()
+                accent_color=discord.Color.red(),
             )
         )
 
-        await welcome_channel.send(
-            view=welcome_view
-        )
+        await welcome_channel.send(view=welcome_view)
 
 
 @bot.event
