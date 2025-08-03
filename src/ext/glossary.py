@@ -4,10 +4,8 @@ from discord import app_commands as appcmds
 from database import supabase_client
 import config
 from datetime import datetime
-from datetime import timedelta
 import utils
 from logging import getLogger
-import re
 
 log = getLogger("discord.fansbot.ext.glossary")
 
