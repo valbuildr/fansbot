@@ -82,7 +82,7 @@ async def glossary(interaction: discord.Interaction, query: str = None):
     ]
 )
 @appcmds.rename(_type="type")
-@config.is_staff()
+@utils.is_staff()
 async def add_glossary(
     interaction: discord.Interaction,
     title: str,
@@ -130,7 +130,7 @@ async def add_glossary(
     _type="The new type of term.",
 )
 @appcmds.rename(_type="type")
-@config.is_staff()
+@utils.is_staff()
 async def edit_glossary(
     interaction: discord.Interaction,
     id: str,
@@ -148,7 +148,7 @@ async def edit_glossary(
 @appcmds.describe(
     id="The ID of the entry.",
 )
-@config.is_staff()
+@utils.is_staff()
 async def remove_glossary(
     interaction: discord.Interaction,
     id: str,
