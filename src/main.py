@@ -9,7 +9,6 @@ import database
 import requests
 from datetime import datetime
 from datetime import timezone
-import git
 import utils
 from logging import getLogger
 from discord import ui
