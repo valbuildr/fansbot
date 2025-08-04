@@ -2,8 +2,10 @@ import discord
 from discord.ext import commands
 from discord import app_commands as appcmds
 from database import supabase_client
+import database
 import config
 from datetime import datetime
+from datetime import timezone
 from datetime import timedelta
 import utils
 from logging import getLogger
@@ -17,15 +19,15 @@ table_name = "moderation_case"
 
 def format_type(type: str):
     match type:
-        case "NOTE":
+        case database.ModerationCase.NOTE:
             return "📝 Note"
-        case "WARN":
+        case database.ModerationCase.WARN:
             return "⚠️ Warn"
-        case "MUTE":
+        case database.ModerationCase.MUTE:
             return "🔇 Mute"
-        case "KICK":
+        case database.ModerationCase.KICK:
             return "🥾 Kick"
-        case "BAN":
+        case database.ModerationCase.BAN:
             return "🔨 Ban"
         case _:
             return "🤷 Unknown"
@@ -33,9 +35,9 @@ def format_type(type: str):
 
 def format_status(status: str):
     match status:
-        case "OPEN":
+        case database.ModerationCase.OPEN:
             return "🟢 Open"
-        case "CLOSED":
+        case database.ModerationCase.CLOSED:
             return "🔴 Closed"
         case _:
             return "🤷 Unknown"
@@ -57,7 +59,7 @@ def parse_time_string(time_string: str):
 
 
 def check_rules_list(rules_string: str):
-    return all(s.isdigit() for s in rules_string)
+    return all(s.isdigit() or s == "\\" for s in rules_string)
 
 
 @appcmds.command(name="add-note", description="Helper/Mod: Add a note onto a user.")
@@ -65,8 +67,8 @@ def check_rules_list(rules_string: str):
 @appcmds.describe(
     user="The user to add a note on to",
     message="The note",
-    proof="Peices of proof that may be relevant. Seperate peices with two commas and a space. e.x. '{peice_1},, {peice_2},, ...'",
-    rules="Rule(s) violated. Seperate rules with one comma and a space. e.x. '1, 2, ...'",
+    proof="Peices of proof that may be relevant. Seperate peices with \\. e.x. '{piece_1}\\{piece_2}'",
+    rules="Rule(s) violated. Seperate rules with \\. e.x. '1\\2'",
 )
 async def add_note(
     interaction: discord.Interaction,
@@ -82,38 +84,29 @@ async def add_note(
         # defer response because we're dealing with databases
         await interaction.response.defer()
 
-        # create dict for supabase
-        d = {
-            "user_id": str(user.id),
-            "type": "NOTE",
-            "status": "OPEN",
-            "message": message,
-            "created_by": str(interaction.user.id),
-            "created_at": utils.dt_to_timestamp(datetime.now(), ""),
-            "editors": [str(interaction.user.id)],
-            "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
-            "is_test_data": config.IS_TEST_ENV,
-        }
+        # create object for database
+        d = database.ModerationCase(
+            user_id=str(user.id),
+            type=database.ModerationCaseType.NOTE,
+            message=message,
+            created_by=str(interaction.user.id),
+            editors=[str(interaction.user.id)],
+        )
 
-        # add proof to supabase dict, if applicable
+        # add proof to db object, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
-        # add rules to supabase dict, if applicable
+            d.proof = database.ModerationCase.split_string(proof)
+        # add rules to db object, if applicable
         if rules:
-            r = rules.split(", ")
             if check_rules_list(rules) == False:
                 await interaction.followup.send(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d.rules = database.ModerationCase.split_string(rules)
 
-        # send data over to supabase
-        try:
-            data = supabase_client.table(table_name).insert(d).execute()
-        except:
-            await interaction.followup.send(content="An error ocurred.")
-            return
+        # save data to db
+        d.save()
 
         # create reply embed
         reply_embed = discord.Embed(
@@ -121,7 +114,7 @@ async def add_note(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        reply_embed.description += f"> **Case ID:** {d.id}\n"
         if rules:
             reply_embed.description += f"> **Rule(s):** {rules}\n"
         if proof:
@@ -140,7 +133,7 @@ async def add_note(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        log_embed.description += f"> **Case ID:** {d.id}\n"
         if rules:
             log_embed.description += f"> **Rule(s):** {rules}\n"
         if proof:
@@ -166,8 +159,8 @@ async def add_note(
 @appcmds.describe(
     user="The user to warn",
     message="The warning's message",
-    proof="Peices of proof that may be relevant. Seperate peices with two commas and a space. e.x. '{peice_1},, {peice_2},, ...'",
-    rules="Rule(s) violated. Seperate rules with one comma and a space. e.x. '1, 2, ...'",
+    proof="Peices of proof that may be relevant. Seperate peices with \\. e.x. '{piece_1}\\{piece_2}'",
+    rules="Rule(s) violated. Seperate rules with \\. e.x. '1\\2'",
     dm="Whether or not to DM the user. Defaults to True",
 )
 async def warn(
@@ -185,38 +178,29 @@ async def warn(
         # defer response because we're dealing with databases
         await interaction.response.defer()
 
-        # create dict for supabase
-        d = {
-            "user_id": str(user.id),
-            "type": "WARN",
-            "status": "OPEN",
-            "message": message,
-            "created_by": str(interaction.user.id),
-            "created_at": utils.dt_to_timestamp(datetime.now(), ""),
-            "editors": [str(interaction.user.id)],
-            "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
-            "is_test_data": config.IS_TEST_ENV,
-        }
+        # create object for database
+        d = database.ModerationCase(
+            user_id=str(user.id),
+            type=database.ModerationCaseType.WARN,
+            message=message,
+            created_by=str(interaction.user.id),
+            editors=[str(interaction.user.id)],
+        )
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d.proof = database.ModerationCase.split_string(proof)
         # add rules to supabase dict, if applicable
         if rules:
-            r = rules.split(", ")
             if check_rules_list(rules) == False:
                 await interaction.followup.send(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d.rules = database.ModerationCase.split_string(rules)
 
-        # send data over to supabase
-        try:
-            data = supabase_client.table(table_name).insert(d).execute()
-        except:
-            await interaction.followup.send(content="An error ocurred.")
-            return
+        # send data to db
+        d.save()
 
         if dm:
             # create dm embed
@@ -225,7 +209,7 @@ async def warn(
                 colour=discord.Colour.yellow(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+            dm_embed.description += f"> **Case ID:** {d.id}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -253,7 +237,7 @@ async def warn(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        reply_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -276,7 +260,7 @@ async def warn(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        log_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -326,8 +310,8 @@ async def mute_length_autocomplete(interaction: discord.Interaction, current: st
     user="The user to mute",
     message="The mute's message",
     length="The mute's length",
-    proof="Peices of proof that may be relevant. Seperate peices with two commas and a space. e.x. '{peice_1},, {peice_2},, ...'",
-    rules="Rule(s) violated. Seperate rules with one comma and a space. e.x. '1, 2, ...'",
+    proof="Peices of proof that may be relevant. Seperate peices with \\. e.x. '{piece_1}\\{piece_2}'",
+    rules="Rule(s) violated. Seperate rules with \\. e.x. '1\\2'",
     dm="Whether or not to DM the user. Defaults to True",
 )
 @appcmds.autocomplete(length=mute_length_autocomplete)
@@ -356,39 +340,30 @@ async def mute(
             )
             return
         else:
-            # create dict for supabase
-            d = {
-                "user_id": str(user.id),
-                "type": "MUTE",
-                "status": "OPEN",
-                "message": message,
-                "created_by": str(interaction.user.id),
-                "created_at": utils.dt_to_timestamp(datetime.now(), ""),
-                "expires": str(utils.dt_to_timestamp(datetime.now() + len, "")),
-                "editors": [str(interaction.user.id)],
-                "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
-                "is_test_data": config.IS_TEST_ENV,
-            }
+            # create object for database
+            d = database.ModerationCase(
+                user_id=str(user.id),
+                type=database.ModerationCaseType.MUTE,
+                message=message,
+                created_by=str(interaction.user.id),
+                editors=[str(interaction.user.id)],
+                expires=datetime.now() + len,
+            )
 
             # add proof to supabase dict, if applicable
             if proof:
-                d["proof"] = proof.split(",, ")
+                d.proof = database.ModerationCase.split_string(proof)
             # add rules to supabase dict, if applicable
             if rules:
-                r = rules.split(", ")
                 if check_rules_list(rules) == False:
                     await interaction.followup.send(
                         content="Please provide numbers for the 'rules' parameter."
                     )
                     return
-                d["rules"] = rules.split(", ")
+                d.rules = database.ModerationCase.split_string(rules)
 
-            # send data over to supabase
-            try:
-                data = supabase_client.table(table_name).insert(d).execute()
-            except:
-                await interaction.followup.send(content="An error ocurred.")
-                return
+            # save data to db
+            d.save()
 
             if dm:
                 # create dm embed
@@ -397,7 +372,7 @@ async def mute(
                     colour=discord.Colour.orange(),
                     description=f"> **Message from moderator:** {message}\n",
                 )
-                dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+                dm_embed.description += f"> **Case ID:** {d.id}\n"
                 dm_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
                 if rules:
                     dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
@@ -426,7 +401,7 @@ async def mute(
                 colour=discord.Colour.green(),
                 description=f"> **Message:** {message}\n",
             )
-            reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+            reply_embed.description += f"> **Case ID:** {d.id}\n"
             reply_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
             if dm:
                 reply_embed.description += (
@@ -450,7 +425,7 @@ async def mute(
                 colour=discord.Colour.blue(),
                 description=f"> **Message:** {message}\n",
             )
-            log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+            log_embed.description += f"> **Case ID:** {d.id}\n"
             log_embed.description += f"> **Length:** {length.lower()} (expires {utils.dt_to_timestamp(datetime.now() + len, 'F')})\n"
             if dm:
                 log_embed.description += (
@@ -484,8 +459,8 @@ async def mute(
 @appcmds.describe(
     user="The user to kick",
     message="The kick's message",
-    proof="Peices of proof that may be relevant. Seperate peices with two commas and a space. e.x. '{peice_1},, {peice_2},, ...'",
-    rules="Rule(s) violated. Seperate rules with one comma and a space. e.x. '1, 2, ...'",
+    proof="Peices of proof that may be relevant. Seperate peices with \\. e.x. '{piece_1}\\{piece_2}'",
+    rules="Rule(s) violated. Seperate rules with \\. e.x. '1\\2'",
     dm="Whether or not to DM the user. Defaults to True",
 )
 async def kick(
@@ -500,38 +475,29 @@ async def kick(
         # defer response because we're dealing with databases
         await interaction.response.defer()
 
-        # create dict for supabase
-        d = {
-            "user_id": str(user.id),
-            "type": "KICK",
-            "status": "OPEN",
-            "message": message,
-            "created_by": str(interaction.user.id),
-            "created_at": utils.dt_to_timestamp(datetime.now(), ""),
-            "editors": [str(interaction.user.id)],
-            "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
-            "is_test_data": config.IS_TEST_ENV,
-        }
+        # create object for database
+        d = database.ModerationCase(
+            user_id=str(user.id),
+            type=database.ModerationCaseType.KICK,
+            message=message,
+            created_by=str(interaction.user.id),
+            editors=[str(interaction.user.id)],
+        )
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d.proof = database.ModerationCase.split_string(proof)
         # add rules to supabase dict, if applicable
         if rules:
-            r = rules.split(", ")
             if check_rules_list(rules) == False:
                 await interaction.followup.send(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
+            d.rules = database.ModerationCase.split_string(rules)
 
-        # send data over to supabase
-        try:
-            data = supabase_client.table(table_name).insert(d).execute()
-        except:
-            await interaction.followup.send(content="An error ocurred.")
-            return
+        # save data to db
+        d.save()
 
         if dm:
             # create dm embed
@@ -540,7 +506,7 @@ async def kick(
                 colour=discord.Colour.red(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+            dm_embed.description += f"> **Case ID:** {d.id}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -568,7 +534,7 @@ async def kick(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        reply_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -591,7 +557,7 @@ async def kick(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        log_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -624,8 +590,8 @@ async def kick(
 @appcmds.describe(
     user="The user to ban",
     message="The ban's message",
-    proof="Peices of proof that may be relevant. Seperate peices with two commas and a space. e.x. '{peice_1},, {peice_2},, ...'",
-    rules="Rule(s) violated. Seperate rules with one comma and a space. e.x. '1, 2, ...'",
+    proof="Peices of proof that may be relevant. Seperate peices with \\. e.x. '{piece_1}\\{piece_2}'",
+    rules="Rule(s) violated. Seperate rules with \\. e.x. '1\\2'",
     dm="Whether or not to DM the user. Defaults to True",
 )
 async def ban(
@@ -641,38 +607,26 @@ async def ban(
         # defer response because we're dealing with databases
         await interaction.response.defer()
 
-        # create dict for supabase
-        d = {
-            "user_id": str(user.id),
-            "type": "BAN",
-            "status": "OPEN",
-            "message": message,
-            "created_by": str(interaction.user.id),
-            "created_at": utils.dt_to_timestamp(datetime.now(), ""),
-            "editors": [str(interaction.user.id)],
-            "last_edited": utils.dt_to_timestamp(datetime.now(), ""),
-            "is_test_data": config.IS_TEST_ENV,
-        }
+        # create object for database
+        d = database.ModerationCase(
+            user_id=str(user.id),
+            type=database.ModerationCaseType.BAN,
+            message=message,
+            created_by=str(interaction.user.id),
+            editors=[str(interaction.user.id)],
+        )
 
         # add proof to supabase dict, if applicable
         if proof:
-            d["proof"] = proof.split(",, ")
+            d.proof = database.ModerationCase.split_string(proof)
         # add rules to supabase dict, if applicable
         if rules:
-            r = rules.split(", ")
             if check_rules_list(rules) == False:
                 await interaction.followup.send(
                     content="Please provide numbers for the 'rules' parameter."
                 )
                 return
-            d["rules"] = rules.split(", ")
-
-        # send data over to supabase
-        try:
-            data = supabase_client.table(table_name).insert(d).execute()
-        except:
-            await interaction.followup.send(content="An error ocurred.")
-            return
+            d.rules = database.ModerationCase.split_string(rules)
 
         if dm:
             # create dm embed
@@ -681,7 +635,7 @@ async def ban(
                 colour=discord.Colour.red(),
                 description=f"> **Message from moderator:** {message}\n",
             )
-            dm_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+            dm_embed.description += f"> **Case ID:** {d.id}\n"
             if rules:
                 dm_embed.description += f"> **Rule(s) violated:** {rules}\n"
             dm_embed.timestamp = datetime.now()
@@ -700,7 +654,7 @@ async def ban(
             colour=discord.Colour.green(),
             description=f"> **Message:** {message}\n",
         )
-        reply_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        reply_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             reply_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -723,7 +677,7 @@ async def ban(
             colour=discord.Colour.blue(),
             description=f"> **Message:** {message}\n",
         )
-        log_embed.description += f"> **Case ID:** {data.data[0]['id']}\n"
+        log_embed.description += f"> **Case ID:** {d.id}\n"
         if dm:
             log_embed.description += (
                 f"> **Could DM User:** {'Yes' if could_dm_user else 'No'}\n"
@@ -840,28 +794,21 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            data = (
-                supabase_client.table(table_name)
-                .select("*")
-                .eq("is_test_data", config.IS_TEST_ENV)
-            )
-            if user:
-                data = data.eq("user_id", str(user.id))
-            if type:
-                data = data.eq("type", type)
-            if created_by:
-                data = data.eq("created_by", str(created_by.id))
-            if status:
-                data = data.eq("status", status)
+            query = database.ModerationCase.select()
 
-            try:
-                data = data.execute()
-            except:
-                await interaction.followup.send(content="An error ocurred.")
-                return
+            if user:
+                query = query.where(database.ModerationCase.user_id == str(user.id))
+            if type:
+                query = query.where(database.ModerationCase.type == type)
+            if created_by:
+                query = query.where(
+                    database.ModerationCase.created_by == str(created_by.id)
+                )
+            if status:
+                query = query.where(database.ModerationCase.status == status)
 
             # ensure the bot sends a response even when there is no cases found
-            if len(data.data) == 0:
+            if len(query) == 0:
                 await interaction.followup.send(content="No cases found.")
                 return
 
@@ -871,7 +818,7 @@ class CaseManagement(appcmds.Group):
             async def get_page(page: int):
                 emb = discord.Embed(title="Case Search", colour=discord.Colour.blue())
                 offset = (page - 1) * L
-                for item in data.data[offset : offset + L]:
+                for item in query[offset : offset + L]:
                     emb.add_field(
                         name=f"Case #{item['id']} - {utils.dt_to_timestamp(utils.epoch_to_datetime(item['created_at']), 'R')}",
                         value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {format_type(item['type'])}\n> **Created by:** <@{item['created_by']}>",
@@ -881,7 +828,7 @@ class CaseManagement(appcmds.Group):
                     name=interaction.user.name,
                     icon_url=interaction.user.display_avatar.url,
                 )
-                n = utils.Pagination.compute_total_pages(len(data.data), L)
+                n = utils.Pagination.compute_total_pages(len(query), L)
                 emb.set_footer(
                     text=f"Page {page}/{n} • For more info on a specific case, run /case info."
                 )
@@ -910,20 +857,12 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            try:
-                data = (
-                    supabase_client.table(table_name)
-                    .select("*")
-                    .eq("id", id)
-                    .eq("is_test_data", config.IS_TEST_ENV)
-                    .execute()
-                )
-            except:
-                await interaction.followup.send(content="An error ocurred.")
-                return
+            query = database.ModerationCase.select().where(
+                database.ModerationCase.id == id
+            )
 
             # check if any data is actually returned
-            if len(data.data) <= 0:
+            if len(query) <= 0:
                 await interaction.followup.send(
                     content=f"No case with the ID {id} was found."
                 )
@@ -932,31 +871,33 @@ class CaseManagement(appcmds.Group):
                 reply_embed = discord.Embed(
                     title=f"Case #{id}", description="", color=discord.Color.blue()
                 )
-                reply_embed.description += f"> **User:** <@{data.data[0]['user_id']}> ({data.data[0]['user_id']})\n"
                 reply_embed.description += (
-                    f"> **Type:** {format_type(data.data[0]['type'])}\n"
+                    f"> **User:** <@{query[0]['user_id']}> ({query[0]['user_id']})\n"
                 )
-                reply_embed.description += f"> **Message:** {data.data[0]['message']}\n"
-                reply_embed.description += f"> **Created by:** <@{data.data[0]['created_by']}> ({data.data[0]['created_by']})\n"
-                reply_embed.description += f"> **Created at:** <t:{data.data[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['created_at']), 'R')})\n"
-                reply_embed.description += f"> **Last edited:** <t:{data.data[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(data.data[0]['last_edited']), 'R')})\n"
                 reply_embed.description += (
-                    f"> **Status:** {format_status(data.data[0]['status'])}\n"
+                    f"> **Type:** {format_type(query[0]['type'])}\n"
                 )
-                if data.data[0]["proof"]:
+                reply_embed.description += f"> **Message:** {query[0]['message']}\n"
+                reply_embed.description += f"> **Created by:** <@{query[0]['created_by']}> ({query[0]['created_by']})\n"
+                reply_embed.description += f"> **Created at:** <t:{query[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(query[0]['created_at']), 'R')})\n"
+                reply_embed.description += f"> **Last edited:** <t:{query[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(query[0]['last_edited']), 'R')})\n"
+                reply_embed.description += (
+                    f"> **Status:** {format_status(query[0]['status'])}\n"
+                )
+                if query[0]["proof"]:
                     v = ""
 
-                    for p in data.data[0]["proof"]:
+                    for p in query[0]["proof"]:
                         v += f"- {p}\n"
 
                     reply_embed.add_field(name="Proof Piece(s)", value=v, inline=False)
-                if data.data[0]["rules"]:
-                    reply_embed.description += f"> **Rule(s):** {str(data.data[0]['rules']).replace('[', '').replace(']', '')}\n"
-                if data.data[0]["expires"]:
-                    reply_embed.description += f"> **Expires:** <t:{data.data[0]['expires']}:F> (<t:{data.data[0]['expires']}:R>)\n"
+                if query[0]["rules"]:
+                    reply_embed.description += f"> **Rule(s):** {str(query[0]['rules']).replace('[', '').replace(']', '')}\n"
+                if query[0]["expires"]:
+                    reply_embed.description += f"> **Expires:** <t:{query[0]['expires']}:F> (<t:{query[0]['expires']}:R>)\n"
                 editors = ""
-                for editor in data.data[0]["editors"]:
-                    if editor == data.data[0]["created_by"]:
+                for editor in query[0]["editors"]:
+                    if editor == query[0]["created_by"]:
                         editors += f"- <@{editor}> (creator)\n"
                     else:
                         editors += f"- <@{editor}>\n"
@@ -980,20 +921,12 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            try:
-                data = (
-                    supabase_client.table(table_name)
-                    .select("*")
-                    .eq("id", id)
-                    .eq("is_test_data", config.IS_TEST_ENV)
-                    .execute()
-                )
-            except:
-                await interaction.followup.send(content="An error ocurred.")
-                return
+            query = database.ModerationCase.select().where(
+                database.ModerationCase.id == id
+            )
 
             # check if any data is actually returned
-            if len(data.data) <= 0:
+            if len(query) <= 0:
                 await interaction.followup.send(
                     content=f"No case with the ID {id} was found."
                 )
@@ -1001,15 +934,15 @@ class CaseManagement(appcmds.Group):
             else:
                 dm_sent = False
 
-                if dm and data.data[0]["type"] != "NOTE":
+                if dm and query[0]["type"] != "NOTE":
                     dm_embed = discord.Embed(
                         title="One of your cases in BBC Fans has been closed.",
-                        description=f"> **Message:** {data.data[0]['message']}\n> **Case ID:** {data.data[0]['id']}\n> **Created:** <t:{data.data[0]['created_at']}:F>",
+                        description=f"> **Message:** {query[0]['message']}\n> **Case ID:** {query[0]['id']}\n> **Created:** <t:{query[0]['created_at']}:F>",
                         color=discord.Color.blue(),
                     )
                     dm_embed.timestamp = datetime.now()
 
-                    user = await interaction.client.fetch_user(data.data[0]["user_id"])
+                    user = await interaction.client.fetch_user(query[0]["user_id"])
 
                     try:
                         await user.send(embed=dm_embed)
@@ -1078,20 +1011,12 @@ class CaseManagement(appcmds.Group):
             await interaction.response.defer()
 
             # get data
-            try:
-                data = (
-                    supabase_client.table(table_name)
-                    .select("*")
-                    .eq("id", id)
-                    .eq("is_test_data", config.IS_TEST_ENV)
-                    .execute()
-                )
-            except:
-                await interaction.followup.send(content="An error ocurred.")
-                return
+            query = database.ModerationCase.select().where(
+                database.ModerationCase.id == id
+            )
 
             # check if any data is actually returned
-            if len(data.data) <= 0:
+            if len(query) <= 0:
                 await interaction.followup.send(
                     content=f"No case with the ID {id} was found."
                 )
