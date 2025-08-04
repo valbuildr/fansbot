@@ -50,14 +50,14 @@ def format_ctx_msg(s: str, ctx: commands.Context):
 
 def is_mod():
     async def predicate(ctx):
-        return config.MOD_ROLE_ID in [role.id for role in ctx.author.role]
+        return config.MOD_ROLE_ID in [role.id for role in ctx.author.roles]
 
     return commands.check(predicate)
 
 
 def is_helper():
     async def predicate(ctx):
-        return config.HELPER_ROLE_ID in [role.id for role in ctx.author.role]
+        return config.HELPER_ROLE_ID in [role.id for role in ctx.author.roles]
 
     return commands.check(predicate)
 
@@ -65,8 +65,8 @@ def is_helper():
 def is_staff():
     async def predicate(ctx):
         return config.HELPER_ROLE_ID in [
-            role.id for role in ctx.author.role
-        ] or config.MOD_LOG_CHANNEL_ID in [role.id for role in ctx.author.role]
+            role.id for role in ctx.author.roles
+        ] or config.MOD_LOG_CHANNEL_ID in [role.id for role in ctx.author.roles]
 
     return commands.check(predicate)
 
