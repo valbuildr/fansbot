@@ -723,6 +723,8 @@ class ScheduleCommands(appcmds.Group):
         )
 
 
+database.psql_db.connect()
+
 database.psql_db.create_tables(
     [
         database.ModerationCase,
