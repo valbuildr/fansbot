@@ -10,7 +10,9 @@ from datetime import timezone
 supabase_client = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
 
 
-psql_db = PostgresqlExtDatabase("fansbot", user="postgres")
+psql_db = PostgresqlExtDatabase(
+    "fansbot", user=config.DATABASE_USER, password=config.DATABASE_PASSWORD
+)
 
 
 class ModerationCaseType(Enum):
@@ -66,7 +68,7 @@ class EnumField(CharField):
 
 class ModerationCase(Model):
     user_id = TextField(null=False)
-    _type = EnumField(ModerationCaseType, null=False)
+    type = EnumField(ModerationCaseType, null=False)
     message = TextField(null=False)
     proof = ArrayField(TextField, null=True)
     created_by = TextField(null=False)
@@ -78,7 +80,11 @@ class ModerationCase(Model):
     )
     editors = ArrayField(TextField, null=False)
     last_edited = DateTimeTZField(null=False, default=datetime.now(timezone.utc))
-    history = JSONField(null=False)
+    history = JSONField(null=True)
+
+    @staticmethod
+    def split_string(obj: str):
+        return obj.split("\\")
 
     class Meta:
         database = psql_db
@@ -89,7 +95,7 @@ class GlossaryTerm(Model):
     created_by = TextField(null=False)
     title = TextField(null=False)
     description = TextField(null=False)
-    _type = EnumField(GlossaryTermType, null=False, default=GlossaryTermType.OTHER)
+    type = EnumField(GlossaryTermType, null=False, default=GlossaryTermType.OTHER)
     last_updated = DateTimeTZField(null=False, default=datetime.now(timezone.utc))
     editors = ArrayField(TextField, null=False)
 
@@ -106,7 +112,7 @@ class Predictions(Model):
     prize_amount = IntegerField(null=True)
     channel_id = TextField(null=False)
     message_id = TextField(null=False)
-    prize_type = EnumField(
+    prizetype = EnumField(
         PredictionPrizeType, null=False, default=PredictionPrizeType.INDIVIDUAL
     )
     status = EnumField(PredictionStatus, null=False, default=PredictionStatus.EXISTS)
@@ -131,7 +137,7 @@ class AutoPredictions(Model):
     options = ArrayField(TextField, null=False)
     prize_amount = IntegerField(null=False)
     channel_id = TextField(null=False)
-    prize_type = EnumField(
+    prizetype = EnumField(
         PredictionPrizeType, null=False, default=PredictionPrizeType.INDIVIDUAL
     )
     enabled = BooleanField(null=False, default=True)
