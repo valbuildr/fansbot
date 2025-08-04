@@ -723,6 +723,16 @@ class ScheduleCommands(appcmds.Group):
         )
 
 
+database.psql_db.create_tables(
+    [
+        database.ModerationCase,
+        database.GlossaryTerm,
+        database.Predictions,
+        database.AutoPredictions,
+    ]
+)
+
+
 @bot.event
 async def on_ready() -> None:
     change_status.start()
