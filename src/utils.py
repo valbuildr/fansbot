@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from typing import Callable
 from typing import Optional
+import config
 
 
 def dt_to_timestamp(dt: datetime, f: str = None) -> str:
@@ -45,6 +46,29 @@ def format_ctx_msg(s: str, ctx: commands.Context):
         .replace("{user_name}", ctx.author.name)
         .replace("{user_id}", str(ctx.author.id))
     )
+
+
+def is_mod():
+    async def predicate(ctx):
+        return config.MOD_ROLE_ID in [role.id for role in ctx.author.roles]
+
+    return commands.check(predicate)
+
+
+def is_helper():
+    async def predicate(ctx):
+        return config.HELPER_ROLE_ID in [role.id for role in ctx.author.roles]
+
+    return commands.check(predicate)
+
+
+def is_staff():
+    async def predicate(ctx):
+        return config.HELPER_ROLE_ID in [
+            role.id for role in ctx.author.roles
+        ] or config.MOD_LOG_CHANNEL_ID in [role.id for role in ctx.author.roles]
+
+    return commands.check(predicate)
 
 
 # credit to Hazzu on stackoverflow thanks mate (https://stackoverflow.com/a/76250596)
