@@ -3,3 +3,4 @@ tzdata
 requests
 gitpython
 supabase
+psycopg2-binary
