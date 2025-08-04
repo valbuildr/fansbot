@@ -98,12 +98,6 @@ async def auto_move_specials():
             await channel.move(end=True, category=other_cat)
 
 
-@tasks.loop(hours=24)
-async def keep_supabase_alive():
-    # query supabase just so it doesnt archive
-    data = database.supabase_client.table("keep_alive").select("*").execute()
-
-
 services = {
     "18048": {
         "name": "BBC Four",
@@ -733,7 +727,6 @@ class ScheduleCommands(appcmds.Group):
 async def on_ready() -> None:
     change_status.start()
     auto_move_specials.start()
-    keep_supabase_alive.start()
     update_scheules.start()
 
     await bot.load_extension("ext.tickets")
