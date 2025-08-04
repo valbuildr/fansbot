@@ -51,6 +51,6 @@ Contributors should **always** follow the [Contributor Code of Conduct](./CONTRI
 
 Violating either are grounds for a ban on contributing to any of my projects in the future.
 
-## Roadmap
+## Future Features
 
-The roadmap is on [Notion](https://petite-chip-1b8.notion.site/e0f81992adda4e33bd3de7653323c0e7?v=e32eac76603f4e9fb2da86784cb32122).
+All planned/proposed new features are on [this](https://github.com/users/valbuildr/projects/2) Github Project.
