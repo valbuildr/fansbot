@@ -1,11 +1,9 @@
 import discord
 from discord.ext import commands
 from discord import app_commands as appcmds
-from database import supabase_client
 import database
 import config
 from datetime import datetime
-from datetime import timezone
 from datetime import timedelta
 import utils
 from logging import getLogger
