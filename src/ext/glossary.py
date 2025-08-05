@@ -1,18 +1,14 @@
 import discord
 from discord.ext import commands
 from discord import app_commands as appcmds
-from database import supabase_client
+import database
 import config
 from datetime import datetime
 from datetime import timezone
 import utils
 from logging import getLogger
-from supabase import SupabaseException
 
 log = getLogger("discord.fansbot.ext.glossary")
-
-
-table_name = "glossary"
 
 
 @appcmds.command(
@@ -24,22 +20,12 @@ async def glossary(interaction: discord.Interaction, query: str = None):
     await interaction.response.defer()
 
     # get data
-    data = (
-        supabase_client.table(table_name)
-        .select("*")
-        .eq("is_test_data", config.IS_TEST_ENV)
-    )
+    d = database.GlossaryTerm.select()
+
     if query:
-        data = data.ilike("title", f"{query}%")
+        d = d.where(database.GlossaryTerm.title.ilike(f"{query}%"))
 
-    try:
-        data = data.execute()
-    except SupabaseException as err:
-        log.error(err)
-        await interaction.followup.send(content="A database error occurred.")
-        return
-
-    if len(data.data) == 0:
+    if len(d) == 0:
         await interaction.followup.send(content="No terms were found.")
         return
 
@@ -48,12 +34,12 @@ async def glossary(interaction: discord.Interaction, query: str = None):
     async def get_page(page: int):
         emb = discord.Embed(title="BBC Fans Glossary", color=discord.Color.blue())
         offset = (page - 1) * L
-        for item in data.data[offset : offset + L]:
-            emb.add_field(name=item.get("title"), value=item.get("description"))
+        for item in d[offset : offset + L]:
+            emb.add_field(name=item.title, value=item.description)
         emb.set_author(
             name=interaction.user.name, icon_url=interaction.user.display_avatar.url
         )
-        n = utils.Pagination.compute_total_pages(len(data.data), L)
+        n = utils.Pagination.compute_total_pages(len(d), L)
         emb.set_footer(text=f"Page {page}/{n}")
         return emb, n
 
@@ -90,24 +76,19 @@ async def add_glossary(
     ] or config.HELPER_ROLE_ID in [role.id for role in interaction.user.roles]:
         await interaction.response.defer()
 
-        o = {
-            "created_by": str(interaction.user.id),
-            "editors": [str(interaction.user.id)],
-            "title": title,
-            "description": description,
-            "type": _type,
-            "is_test_data": config.IS_TEST_ENV,
-        }
+        _type = database.GlossaryTermType[_type]
 
-        try:
-            data = supabase_client.table(table_name).insert(o).execute()
-        except:
-            await interaction.followup.send(content="An error occurred.")
-            return
+        d = database.GlossaryTerm.create(
+            created_by=str(interaction.user.id),
+            title=title,
+            description=description,
+            term_type=_type,
+            editors=[str(interaction.user.id)],
+        )
 
         reply_embed = discord.Embed(
             title="Added glossary term",
-            description=f"> **Title:** {data.data[0]["title"]}\n> **Description:** {data.data[0]["description"]}\n> **ID:** {data.data[0]["id"]}\n> **Type:** {data.data[0]["type"]}",
+            description=f"> **Title:** {d.title}\n> **Description:** {d.description}\n> **ID:** {d.id}\n> **Type:** {d.term_type.value}",
             color=discord.Color.blue(),
         )
         reply_embed.set_author(
@@ -136,18 +117,9 @@ async def edit_glossary(
     if config.MOD_ROLE_ID in [
         role.id for role in interaction.user.roles
     ] or config.HELPER_ROLE_ID in [role.id for role in interaction.user.roles]:
-        try:
-            data = (
-                supabase_client.table(table_name).select("*").eq("id", id).execute()
-            )  # this could cause interactions to fail, but it hasn't yet in my testing - val
-        except SupabaseException as err:
-            log.error(err)
-            await interaction.response.send_message(
-                content="A database error occurred."
-            )
-            return
+        d = database.GlossaryTerm.select().where(database.GlossaryTerm.id == id)
 
-        if len(data.data) == 0:
+        if len(d) == 0:
             await interaction.response.send_message(
                 content=f"No terms with ID `{id}` were found."
             )
@@ -160,77 +132,65 @@ async def edit_glossary(
                     required=True,
                     placeholder="The acronym, emoji, phrase, etc.",
                     style=discord.TextStyle.short,
-                    default=data.data[0].get("title"),
+                    default=d[0].title,
                 )
                 new_description = discord.ui.TextInput(
                     label="Description",
                     required=True,
                     placeholder="The meaning of the acronym, emoji, phrase, etc.",
                     style=discord.TextStyle.paragraph,
-                    default=data.data[0].get("description"),
+                    default=d[0].description,
                 )
                 new_type = discord.ui.TextInput(
                     label="Type",
                     required=True,
                     placeholder="The type of the entry.",
                     style=discord.TextStyle.short,
-                    default=data.data[0].get("type"),
+                    default=d[0].term_type.value,
                 )
 
                 async def on_submit(self, interaction: discord.Interaction):
                     await interaction.response.defer()
 
-                    old_title = data.data[0].get("title")
-                    old_description = data.data[0].get("description")
-                    old_type = data.data[0].get("type")
+                    old_title = d[0].title
+                    old_description = d[0].description
+                    old_type = d[0].term_type
 
-                    d = {
-                        "title": self.new_title.value,
-                        "description": self.new_description.value,
-                        "type": self.new_type.value.upper(),
-                        "editors": data.data[0].get("editors"),
-                        "last_updated": datetime.now(timezone.utc).isoformat(),
-                    }
+                    if self.new_type.value.upper() not in ["ACRONYM", "TERM", "EMOJI"]:
+                        d[0].term_type = database.GlossaryTermType.OTHER
+                    else:
+                        d[0].term_type = database.GlossaryTermType[
+                            self.new_type.value.upper()
+                        ]
 
-                    if d["type"] not in ["ACRONYM", "TERM", "EMOJI"]:
-                        d["type"] = "OTHER"
+                    d[0].title = self.new_title.value
+                    d[0].description = self.new_description.value
+                    d[0].last_updated = datetime.now(timezone.utc).isoformat()
 
-                    if str(interaction.user.id) not in d["editors"]:
+                    if str(interaction.user.id) not in d[0].editors:
                         d["editors"].append(str(interaction.user.id))
 
-                    try:
-                        r = (
-                            supabase_client.table(table_name)
-                            .update(d)
-                            .eq("id", id)
-                            .execute()
-                        )
-                    except SupabaseException as err:
-                        log.error(err)
-                        await interaction.followup.send(
-                            content="A database error occurred."
-                        )
-                        return
+                    d[0].save()
 
                     resp_embed = discord.Embed(
                         title=f"Updated term #{id}", color=discord.Color.green()
                     )
-                    if old_title is not d["title"]:
+                    if old_title is not d[0].title:
                         resp_embed.add_field(
                             name="Title",
-                            value=f"{d['title']}",
+                            value=f"{d[0].title}",
                             inline=False,
                         )
-                    if old_description is not d["description"]:
+                    if old_description is not d[0].description:
                         resp_embed.add_field(
                             name="Description",
-                            value=f"{d['description']}",
+                            value=f"{d[0].description}",
                             inline=False,
                         )
-                    if old_type is not d["type"]:
+                    if old_type is not d[0].term_type.value:
                         resp_embed.add_field(
                             name="Type",
-                            value=f"{d['type']}",
+                            value=f"{d[0].term_type.value}",
                             inline=False,
                         )
                     resp_embed.set_author(
@@ -264,35 +224,15 @@ async def remove_glossary(
     ] or config.HELPER_ROLE_ID in [role.id for role in interaction.user.roles]:
         await interaction.response.defer()
 
-        try:
-            data = supabase_client.table(table_name).select("*").eq("id", id).execute()
-        except SupabaseException as err:
-            log.error(err)
-            await interaction.followup.send(content="A database error occurred.")
-            return
-        except:
-            log.error("Unknown error!")
-            await interaction.followup.send(content="An unkown error occurred.")
-            return
+        d = database.GlossaryTerm.select().where(database.GlossaryTerm.id == id)
 
-        if len(data.data) is 0:
+        if len(d) == 0:
             await interaction.followup.send(
                 content=f"There is no term with the ID {id}."
             )
             return
         else:
-            term = data.data[0]
-
-            try:
-                r = supabase_client.table(table_name).delete().eq("id", id).execute()
-            except SupabaseException as err:
-                log.error(err)
-                await interaction.followup.send(content="A database error occurred.")
-                return
-            except:
-                log.error("Unknown error!")
-                await interaction.followup.send(content="An unkown error occurred.")
-                return
+            d[0].delete_instance()
 
             await interaction.followup.send(content=f"Deleted term #{id}")
     else:
