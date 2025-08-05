@@ -275,7 +275,7 @@ async def remove_glossary(
             await interaction.followup.send(content="An unkown error occurred.")
             return
 
-        if len(data.data) is 0:
+        if len(data.data) == 0:
             await interaction.followup.send(
                 content=f"There is no term with the ID {id}."
             )
