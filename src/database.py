@@ -1,13 +1,9 @@
 import config
-from supabase import create_client
 from playhouse.postgres_ext import *
 from peewee import *
 from enum import Enum
 from datetime import datetime
 from datetime import timezone
-
-# deprecated, use psql_db instead
-supabase_client = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
 
 
 psql_db = PostgresqlExtDatabase(
