@@ -68,13 +68,13 @@ class EnumField(CharField):
 
 class ModerationCase(Model):
     user_id = TextField(null=False)
-    type = EnumField(ModerationCaseType, null=False)
+    case_type = EnumField(ModerationCaseType, null=False)
     message = TextField(null=False)
     proof = ArrayField(TextField, null=True)
     created_by = TextField(null=False)
     created_at = DateTimeTZField(null=False, default=datetime.now(timezone.utc))
     rules = ArrayField(IntegerField, null=True)
-    expies = DateTimeTZField(null=True)
+    expires_at = DateTimeTZField(null=True)
     status = EnumField(
         ModerationCaseStatus, null=False, default=ModerationCaseStatus.OPEN
     )
@@ -95,7 +95,7 @@ class GlossaryTerm(Model):
     created_by = TextField(null=False)
     title = TextField(null=False)
     description = TextField(null=False)
-    type = EnumField(GlossaryTermType, null=False, default=GlossaryTermType.OTHER)
+    term_type = EnumField(GlossaryTermType, null=False, default=GlossaryTermType.OTHER)
     last_updated = DateTimeTZField(null=False, default=datetime.now(timezone.utc))
     editors = ArrayField(TextField, null=False)
 
