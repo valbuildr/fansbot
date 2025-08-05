@@ -14,20 +14,17 @@ import re
 log = getLogger("discord.fansbot.ext.moderation")
 
 
-table_name = "moderation_case"
-
-
 def format_type(type: str):
     match type:
-        case database.ModerationCase.NOTE:
+        case "NOTE":
             return "📝 Note"
-        case database.ModerationCase.WARN:
+        case "WARN":
             return "⚠️ Warn"
-        case database.ModerationCase.MUTE:
+        case "MUTE":
             return "🔇 Mute"
-        case database.ModerationCase.KICK:
+        case "KICK":
             return "🥾 Kick"
-        case database.ModerationCase.BAN:
+        case "BAN":
             return "🔨 Ban"
         case _:
             return "🤷 Unknown"
@@ -35,9 +32,9 @@ def format_type(type: str):
 
 def format_status(status: str):
     match status:
-        case database.ModerationCase.OPEN:
+        case "OPEN":
             return "🟢 Open"
-        case database.ModerationCase.CLOSED:
+        case "CLOSED":
             return "🔴 Closed"
         case _:
             return "🤷 Unknown"
@@ -87,7 +84,7 @@ async def add_note(
         # create object for database
         d = database.ModerationCase(
             user_id=str(user.id),
-            type=database.ModerationCaseType.NOTE,
+            case_type=database.ModerationCaseType.NOTE,
             message=message,
             created_by=str(interaction.user.id),
             editors=[str(interaction.user.id)],
@@ -181,7 +178,7 @@ async def warn(
         # create object for database
         d = database.ModerationCase(
             user_id=str(user.id),
-            type=database.ModerationCaseType.WARN,
+            case_type=database.ModerationCaseType.WARN,
             message=message,
             created_by=str(interaction.user.id),
             editors=[str(interaction.user.id)],
@@ -343,11 +340,11 @@ async def mute(
             # create object for database
             d = database.ModerationCase(
                 user_id=str(user.id),
-                type=database.ModerationCaseType.MUTE,
+                case_type=database.ModerationCaseType.MUTE,
                 message=message,
                 created_by=str(interaction.user.id),
                 editors=[str(interaction.user.id)],
-                expires=datetime.now() + len,
+                expires_at=datetime.now() + len,
             )
 
             # add proof to supabase dict, if applicable
@@ -478,7 +475,7 @@ async def kick(
         # create object for database
         d = database.ModerationCase(
             user_id=str(user.id),
-            type=database.ModerationCaseType.KICK,
+            case_type=database.ModerationCaseType.KICK,
             message=message,
             created_by=str(interaction.user.id),
             editors=[str(interaction.user.id)],
@@ -610,7 +607,7 @@ async def ban(
         # create object for database
         d = database.ModerationCase(
             user_id=str(user.id),
-            type=database.ModerationCaseType.BAN,
+            case_type=database.ModerationCaseType.BAN,
             message=message,
             created_by=str(interaction.user.id),
             editors=[str(interaction.user.id)],
@@ -627,6 +624,9 @@ async def ban(
                 )
                 return
             d.rules = database.ModerationCase.split_string(rules)
+
+        # send data to db
+        d.save()
 
         if dm:
             # create dm embed
@@ -761,12 +761,13 @@ class CaseManagement(appcmds.Group):
     @appcmds.guild_only()
     @appcmds.describe(
         user="Filter by user",
-        type="Filter by type",
+        case_type="Filter by type",
         created_by="Filter by who created the case",
         status="Filter by case status",
     )
+    @appcmds.rename(case_type="case-type")
     @appcmds.choices(
-        type=[
+        case_type=[
             appcmds.Choice(name="Note", value="NOTE"),
             appcmds.Choice(name="Warn", value="WARN"),
             appcmds.Choice(name="Kick", value="KICK"),
@@ -781,7 +782,7 @@ class CaseManagement(appcmds.Group):
         self,
         interaction: discord.Interaction,
         user: discord.User = None,
-        type: str = None,
+        case_type: str = None,
         created_by: discord.User = None,
         status: str = None,
     ):
@@ -798,8 +799,8 @@ class CaseManagement(appcmds.Group):
 
             if user:
                 query = query.where(database.ModerationCase.user_id == str(user.id))
-            if type:
-                query = query.where(database.ModerationCase.type == type)
+            if case_type:
+                query = query.where(database.ModerationCase.case_type == case_type)
             if created_by:
                 query = query.where(
                     database.ModerationCase.created_by == str(created_by.id)
@@ -820,8 +821,8 @@ class CaseManagement(appcmds.Group):
                 offset = (page - 1) * L
                 for item in query[offset : offset + L]:
                     emb.add_field(
-                        name=f"Case #{item['id']} - {utils.dt_to_timestamp(utils.epoch_to_datetime(item['created_at']), 'R')}",
-                        value=f"> **Message:** {item['message']}\n> **User:** <@{item['user_id']}>\n> **Type:** {format_type(item['type'])}\n> **Created by:** <@{item['created_by']}>",
+                        name=f"Case #{item.id} - {utils.dt_to_timestamp(item.created_at, 'R')}",
+                        value=f"> **Message:** {item.message}\n> **User:** <@{item.user_id}>\n> **Type:** {format_type(item.case_type.value)}\n> **Created by:** <@{item.created_by}>",
                         inline=False,
                     )
                 emb.set_author(
@@ -872,32 +873,34 @@ class CaseManagement(appcmds.Group):
                     title=f"Case #{id}", description="", color=discord.Color.blue()
                 )
                 reply_embed.description += (
-                    f"> **User:** <@{query[0]['user_id']}> ({query[0]['user_id']})\n"
+                    f"> **User:** <@{query[0].user_id}> ({query[0].user_id})\n"
                 )
                 reply_embed.description += (
-                    f"> **Type:** {format_type(query[0]['type'])}\n"
+                    f"> **Type:** {format_type(query[0].case_type)}\n"
                 )
-                reply_embed.description += f"> **Message:** {query[0]['message']}\n"
-                reply_embed.description += f"> **Created by:** <@{query[0]['created_by']}> ({query[0]['created_by']})\n"
-                reply_embed.description += f"> **Created at:** <t:{query[0]['created_at']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(query[0]['created_at']), 'R')})\n"
-                reply_embed.description += f"> **Last edited:** <t:{query[0]['last_edited']}:F> ({utils.dt_to_timestamp(utils.epoch_to_datetime(query[0]['last_edited']), 'R')})\n"
+                reply_embed.description += f"> **Message:** {query[0].message}\n"
+                reply_embed.description += f"> **Created by:** <@{query[0].created_by}> ({query[0].created_by})\n"
+                reply_embed.description += f"> **Created at:** {utils.dt_to_timestamp(query[0].created_at, 'F')} ({utils.dt_to_timestamp(query[0].created_at, 'R')})\n"
+                reply_embed.description += f"> **Last edited:** <t:{query[0].last_edited}:F> ({utils.dt_to_timestamp(query[0].last_edited, 'R')})\n"
                 reply_embed.description += (
-                    f"> **Status:** {format_status(query[0]['status'])}\n"
+                    f"> **Status:** {format_status(query[0].status)}\n"
                 )
-                if query[0]["proof"]:
+                if query[0].proof:
                     v = ""
 
-                    for p in query[0]["proof"]:
+                    for p in query[0].proof:
                         v += f"- {p}\n"
 
                     reply_embed.add_field(name="Proof Piece(s)", value=v, inline=False)
-                if query[0]["rules"]:
-                    reply_embed.description += f"> **Rule(s):** {str(query[0]['rules']).replace('[', '').replace(']', '')}\n"
-                if query[0]["expires"]:
-                    reply_embed.description += f"> **Expires:** <t:{query[0]['expires']}:F> (<t:{query[0]['expires']}:R>)\n"
+                if query[0].rules:
+                    reply_embed.description += (
+                        f"> **Rule(s):** {", ".join(query[0].rules)}\n"
+                    )
+                if query[0].expires_at:
+                    reply_embed.description += f"> **Expires:** <t:{query[0].expires_at}:F> (<t:{query[0].expires_at}:R>)\n"
                 editors = ""
-                for editor in query[0]["editors"]:
-                    if editor == query[0]["created_by"]:
+                for editor in query[0].editors:
+                    if editor == query[0].created_by:
                         editors += f"- <@{editor}> (creator)\n"
                     else:
                         editors += f"- <@{editor}>\n"
@@ -934,15 +937,15 @@ class CaseManagement(appcmds.Group):
             else:
                 dm_sent = False
 
-                if dm and query[0]["type"] != "NOTE":
+                if dm and query[0].case_type != "NOTE":
                     dm_embed = discord.Embed(
                         title="One of your cases in BBC Fans has been closed.",
-                        description=f"> **Message:** {query[0]['message']}\n> **Case ID:** {query[0]['id']}\n> **Created:** <t:{query[0]['created_at']}:F>",
+                        description=f"> **Message:** {query[0].message}\n> **Case ID:** {query[0].id}\n> **Created:** <t:{query[0].created_at}:F>",
                         color=discord.Color.blue(),
                     )
                     dm_embed.timestamp = datetime.now()
 
-                    user = await interaction.client.fetch_user(query[0]["user_id"])
+                    user = await interaction.client.fetch_user(query[0].user_id)
 
                     try:
                         await user.send(embed=dm_embed)
@@ -986,14 +989,9 @@ class CaseManagement(appcmds.Group):
                 log_channel = interaction.guild.get_channel(config.MOD_LOG_CHANNEL_ID)
                 await log_channel.send(embed=log_embed)
 
-                # change data in supabase
-                try:
-                    supabase_client.table(table_name).update({"status": "CLOSED"}).eq(
-                        "id", id
-                    ).execute()
-                except:
-                    await interaction.followup.send(content="An error ocurred.")
-                    return
+                # change data in db
+                query[0].status = database.ModerationCaseStatus.CLOSED
+                query[0].save()
 
                 # reply
                 await interaction.followup.send(embed=reply_embed)
@@ -1048,12 +1046,8 @@ class CaseManagement(appcmds.Group):
                 log_channel = interaction.guild.get_channel(config.MOD_LOG_CHANNEL_ID)
                 await log_channel.send(embed=log_embed)
 
-                # change data in supabase
-                try:
-                    supabase_client.table(table_name).delete().eq("id", id).execute()
-                except:
-                    await interaction.followup.send(content="An error ocurred.")
-                    return
+                # change data in db
+                query[0].delete_instance()
 
                 # reply
                 await interaction.followup.send(embed=reply_embed)
