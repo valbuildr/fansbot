@@ -6,8 +6,6 @@
 
 I, valbuildr, will not store any directly identifiable data. The only closely identifiable data, is your Discord User ID, which is public information anyway. 🤷
 
-Data is stored with Supabase, so please do give their privacy policy a read as well: https://supabase.com/privacy
-
 In case of concern please reach out. You can do so in the following ways:
 
 - Discord: @valbuilded
