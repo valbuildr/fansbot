@@ -1,6 +1,5 @@
 discord.py[voice]
 tzdata
 requests
-gitpython
-supabase
+peewee
 psycopg2-binary
