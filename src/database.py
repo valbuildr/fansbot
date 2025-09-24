@@ -1,14 +1,13 @@
 import config
 from playhouse.postgres_ext import *
+from playhouse.db_url import connect
 from peewee import *
 from enum import Enum
 from datetime import datetime
 from datetime import timezone
 
 
-psql_db = PostgresqlExtDatabase(
-    "fansbot", user=config.DATABASE_USER, password=config.DATABASE_PASSWORD
-)
+psql_db = connect(config.DATABASE_URL)
 
 
 class ModerationCaseType(Enum):
