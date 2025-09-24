@@ -766,7 +766,7 @@ async def on_member_join(member: discord.Member):
         welcome_view.add_item(
             discord.ui.Container(
                 discord.ui.TextDisplay(
-                    f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, "D")} ({utils.dt_to_timestamp(member.created_at, "R")})\n-# ID: {member.id}"
+                    f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, 'D')} ({utils.dt_to_timestamp(member.created_at, 'R')})\n-# ID: {member.id}"
                 ),
                 accent_color=discord.Color.green(),
             )
