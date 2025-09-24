@@ -1024,7 +1024,8 @@ async def message_info(
 ):
     msg = await user.fetch_message(message_id)
     if msg:
-        c = f"> {msg.content.replace('\\n', '\\n> ')}\n\\- {user.mention}\n"
+        fm = msg.content.replace("\n", "\n> ")
+        c = "> "+ fm + "\n\\- {user.mention}\n"
         if len(msg.attachments) >= 1:
             c += "## Attachments"
             for att in msg.attachments:
