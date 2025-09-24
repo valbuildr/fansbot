@@ -892,7 +892,7 @@ class CaseManagement(appcmds.Group):
                     reply_embed.add_field(name="Proof Piece(s)", value=v, inline=False)
                 if query[0].rules:
                     reply_embed.description += (
-                        f"> **Rule(s):** {", ".join(query[0].rules)}\n"
+                        f"> **Rule(s):** {', '.join(query[0].rules)}\n"
                     )
                 if query[0].expires_at:
                     reply_embed.description += f"> **Expires:** <t:{query[0].expires_at}:F> (<t:{query[0].expires_at}:R>)\n"
