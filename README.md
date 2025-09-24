@@ -29,11 +29,13 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Hosting
 
 1. Download the source code from the [Releases page](https://github.com/valbuildr/fansbot/releases). (You can also get the latest code changes [here](https://github.com/valbuildr/fansbot/archive/refs/heads/main.zip). Expect more bugs with that.)
-2. Ensure you have Python 3.13.3 (or another supported Python version) installed.
-3. Fill out `src/config.ex.py` and rename it to `config.py`.
-4. (Optional) Create a virtual environment with `python3 -m venv .venv/` and [activate it](https://docs.python.org/3/library/venv.html#how-venvs-work).
-5. Install the required packages with pip. (`python3 -m pip install -r requirements.txt`)
-6. Run the bot with `python3 src/main.py`.
+2. Ensure you have Python 3.13.3 (or another supported Python version) and Docker/Docker Compose installed.
+3. Fill out `src/config.example.py` and rename it to `config.py`.
+4. Fill out `docker-compose.example.yml` and rename it to `docker-compose.yml`.
+5. Start the database server with `docker compose up`.
+6. (Optional, but recommended) Create a virtual environment with `python3 -m venv .venv/` and [activate it](https://docs.python.org/3/library/venv.html#how-venvs-work).
+7. Install the required packages with pip. (`python3 -m pip install -r requirements.txt`)
+8. Run the bot with `python3 src/main.py`.
 
 ## Artificial Intelligence
 
