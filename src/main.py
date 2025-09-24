@@ -766,7 +766,7 @@ async def on_member_join(member: discord.Member):
         welcome_view.add_item(
             discord.ui.Container(
                 discord.ui.TextDisplay(
-                    f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, "D")} ({utils.dt_to_timestamp(member.created_at, "R")})\n-# ID: {member.id}"
+                    f"Welcome {member.mention}! Please read through our <#{config.RULES_CHANNEL_ID}> and click the 'I agree' button to gain full access to the server.\n-# Joined Discord: {utils.dt_to_timestamp(member.created_at, 'D')} ({utils.dt_to_timestamp(member.created_at, 'R')})\n-# ID: {member.id}"
                 ),
                 accent_color=discord.Color.green(),
             )
@@ -786,7 +786,7 @@ async def on_member_remove(member: discord.Member):
         welcome_view.add_item(
             discord.ui.Container(
                 discord.ui.TextDisplay(
-                    f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {utils.dt_to_timestamp(member.joined_at, "R")}]"
+                    f"{member.name} has left.\n-# ID: {member.id}\n-# Joined: {utils.dt_to_timestamp(member.joined_at, 'R')}]"
                 ),
                 accent_color=discord.Color.red(),
             )
@@ -1024,7 +1024,8 @@ async def message_info(
 ):
     msg = await user.fetch_message(message_id)
     if msg:
-        c = f"> {msg.content.replace("\n", "\n> ")}\n\\- {user.mention}\n"
+        fm = msg.content.replace("\n", "\n> ")
+        c = "> "+ fm + "\n\\- {user.mention}\n"
         if len(msg.attachments) >= 1:
             c += "## Attachments"
             for att in msg.attachments:

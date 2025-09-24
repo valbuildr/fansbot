@@ -1,6 +1,5 @@
-git+https://github.com/DA-344/d.py@feat/components-v2
+discord.py[voice]
 tzdata
 requests
-gitpython
-supabase
+peewee
 psycopg2-binary
