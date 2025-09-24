@@ -16,8 +16,8 @@ POLLS_CHANNEL_ID = 0
 
 SOURCE_CODE_LINK = ""
 
-DATABASE_USER = "postgres"
-DATABASE_PASSWORD = ""
+DATABASE_URL = "postgresql://postgres:verysecurepassword@localhost:5432/local"
+#               postgresql://{user}:{password}@localhost:{port}/{name}
 
 MOD_LOG_CHANNEL_ID = 0
 
