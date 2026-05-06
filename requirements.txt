@@ -1,5 +1,0 @@
-discord.py[voice]
-tzdata
-requests
-peewee
-psycopg2-binary
