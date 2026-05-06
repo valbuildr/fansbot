@@ -1,8 +1,10 @@
 import * as z from "zod";
 
 export const ConfigKeys = {
+    GUILD: "guild",
     ROLES: "roles",
-    CHANNELS: "channels"
+    CHANNELS: "channels",
+    CATEGORIES: "categories",
 } as const;
 
 export type ConfigKey = (typeof ConfigKeys)[keyof typeof ConfigKeys];
@@ -17,12 +19,22 @@ export function validateConfigValue(
 }
 
 const schemaMap = {
+    [ConfigKeys.GUILD]: z.object({ // pg is a pain
+        id: z.string(),
+    }),
     [ConfigKeys.ROLES]: z.object({
         mod: z.string(),
         helper: z.string(),
+        member: z.string(),
+        unverified: z.string(),
     }),
     [ConfigKeys.CHANNELS]: z.object({
         specials: z.string(),
+    }),
+    [ConfigKeys.CATEGORIES]: z.object({
+        other: z.string(),
+        main: z.string(),
+        tickets: z.string(),
     })
 } satisfies Record<string, z.ZodTypeAny>;
 

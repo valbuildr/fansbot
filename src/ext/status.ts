@@ -7,7 +7,7 @@ import { isMod } from "@/utils/staffCheck";
 import { eq } from "drizzle-orm";
 import { Pagination } from "pagination.djs";
 
-function statusTask(client: Client<true>) {
+async function statusTask(client: Client<true>) {
     client.database.select().from(schema.status)
         .then((entries) => {
             if (entries.length !== 0) {
@@ -332,8 +332,8 @@ export const slashCommands: SlashCommandData[] = [
     }
 ];
 
-export function setup(client: Client<true>) {
-    statusTask(client)
+export async function setup(client: Client<true>) {
+    await statusTask(client)
     const statusTaskId = setInterval(() => statusTask(client), 120 * 1000);
 
     return { tasks: { status: statusTaskId } };

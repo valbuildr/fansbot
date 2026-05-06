@@ -5,16 +5,16 @@ import type { SlashCommandData, TextCommandData } from "./utils/commandTypes";
 
 const client = new Client();
 
-client.once(Events.ClientReady, (readyClient) => {
+client.once(Events.ClientReady, async (readyClient) => {
     console.log(`Logged in as ${readyClient.user.username}`);
 
     type Module = {
         slashCommands?: SlashCommandData[];
         textCommands?: TextCommandData[];
-        setup?: (client: Client<true>) => void;
+        setup?: (client: Client<true>) => Promise<void>;
     }
 
-    Object.entries(ext as Record<string, Module>).forEach(([k, e]) => {
+    Object.entries(ext as Record<string, Module>).forEach(async ([k, e]) => {
         console.log(`Loading ${k} extension...`);
         if (e.slashCommands) {
             e.slashCommands.forEach((cmd) => {
@@ -29,7 +29,7 @@ client.once(Events.ClientReady, (readyClient) => {
         }
 
         if (e.setup) {
-            e.setup(readyClient as Client<true>);
+            await e.setup(readyClient as Client<true>);
         }
         console.log(`Loaded ${k} extension. Added ${e.slashCommands?.length ?? 0} slash commands and ${e.textCommands?.length ?? 0} text commands.`);
     });

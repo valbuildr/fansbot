@@ -4,6 +4,9 @@
 
 - [ ] BBC Fans Live system.
    - Allow moderators and helpers to send updates in formatted messages.
+- [ ] Birthday commands
+   - Only store date/month, no years for privacy.
+   - Maybe timezones?
 - [ ] Create a database backup system.
    - Weekly backups, store locally and on Discord.
 - [ ] Add rules model and management commands.
@@ -12,7 +15,7 @@
 - [ ] Honeypot channel.
    - A channel where anyone can send messages, but will be banned if they do so. Designed to catch spam bots.
 - [ ] Refactor moderation commands.
-   - Use modals, (and their new components) rules model, and Components v2.
+   - Use modals (and their new components) and rules model.
    - Ban command seems to delete messages from the banned user, ensure that it doesn't.
 - [ ] Add 'Colourdle.'
    - 5 random colors, (blue, brown, green, orange, red, white, yellow, and purple) 8 guesses.
