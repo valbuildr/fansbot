@@ -25,6 +25,7 @@
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "pagination.djs": "^4.0.18",
     "pg": "^8.20.0",
     "zod": "^4.4.3"
   }

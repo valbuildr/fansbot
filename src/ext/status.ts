@@ -5,6 +5,7 @@ import * as schema from "@/db/schema";
 import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, GuildMember, InteractionContextType, Message, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { isMod } from "@/utils/staffCheck";
 import { eq } from "drizzle-orm";
+import { Pagination } from "pagination.djs";
 
 function statusTask(client: Client<true>) {
     client.database.select().from(schema.status)
@@ -159,6 +160,7 @@ export const slashCommands: SlashCommandData[] = [
                                 { name: "Name", value: `${i[0]?.name ?? ""}`, inline: false },
                                 { name: "Displayed as", value: `${fullDisplay(i[0]?.name ?? "", i[0]?.type ?? "playing")}`, inline: false },
                             )
+                            .setTimestamp()
                             .setColor(Colors.Green);
                         await interaction.reply({ embeds: [e] });
                     } else if (subcommand === "ls") {
@@ -176,30 +178,29 @@ export const slashCommands: SlashCommandData[] = [
                             q = q.filter((e) => e.name.includes(inputs.name!));
                         }
 
-                        const e = new EmbedBuilder()
-                            .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() ?? interaction.guild.iconURL()! })
-                            .setTitle("🔍 Status Entry Query")
-                            .setColor(Colors.Blue);
-
-                        q.forEach((en) => {
-                            e.addFields(
-                                {
-                                    name: `\`${en.id}\``,
-                                    value: fullDisplay(en.name, en.type),
-                                    inline: false
-                                }
-                            )
-                        });
-
                         if (q.length === 0) {
-                            e.setDescription("No entries match the selected filters.");
+                            await interaction.reply("No entries match the selected filters.");
+                            return;
+                        } else {
+                            const p = new Pagination(interaction, { limit: 10 })
+                                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() ?? interaction.guild.iconURL()! })
+                                .setTitle("🔍 Status Entry Query")
+                                .setColor(Colors.Blue)
+                                // .setFooter(
+                                //     { text: `${q.length} entries found` }
+                                // )
+                                .setFields(q.map((en) => {
+                                    return {
+                                        name: `\`${en.id}\``,
+                                        value: fullDisplay(en.name, en.type),
+                                        inline: false
+                                    }
+                                }))
+                                .paginateFields(true)
+                                .setAuthorizedUsers([interaction.user.id])
+                                .setTimestamp()
+                                .render();
                         }
-
-                        e.setFooter(
-                            { text: `${q.length} entries found` }
-                        )
-
-                        await interaction.reply({ embeds: [e] });
                     } else if (subcommand === "update") {
                         const inputs = {
                             id: interaction.options.getString("id", true),
@@ -224,6 +225,7 @@ export const slashCommands: SlashCommandData[] = [
                                 .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() ?? interaction.guild.iconURL()! })
                                 .setTitle("✏️ Status Entry Updated")
                                 .setColor(Colors.Yellow)
+                                .setTimestamp()
                                 .addFields(
                                     { name: "Old Name", value: q[0]?.name ?? "", inline: true },
                                     { name: "Old Type", value: typeDisplay(q[0]?.type ?? "playing"), inline: true },
@@ -249,6 +251,7 @@ export const slashCommands: SlashCommandData[] = [
                                 .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() ?? interaction.guild.iconURL()! })
                                 .setTitle("🗑️ Delete Status Entry?")
                                 .setColor(Colors.Red)
+                                .setTimestamp()
                                 .addFields(
                                     { name: "Type", value: typeDisplay(q[0]?.type ?? "playing"), inline: false },
                                     { name: "Name", value: q[0]?.name ?? "", inline: false },
