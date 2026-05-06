@@ -11,4 +11,4 @@ export const config = p.pgTable(
         created: p.timestamp("created", { mode: "date" }).defaultNow().notNull(),
         updated: p.timestamp("updated", { mode: "date" }).defaultNow().notNull().$onUpdate(() => new Date),
     }
-)
+).enableRLS();

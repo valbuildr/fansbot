@@ -27,16 +27,20 @@
    - Show colour in an image and accent colour of container.
    - Create 'Hexle Ban' role and disallow those who have the role from playing.
 - [ ] Add 'Gamble Frenzy'
-   - 2-4 players
-   - Various gambling-related games. (Blackjack, Bingo, Roulette, Slots, Lucky Wheel)
-   - Players compete to make the most money in a limited amount of time.
-   - In round 1, users start with £500 and are challenged to get to £2,500.
+   - 2-8 players
+   - Various gambling-related games
+      - Blackjack
+      - Bingo
+      - Roulette
+      - Slots
+      - Lucky Wheel
+      - Singleplayer Poker (like Balatro, make the strongest Poker hand)
+   - Players compete to make the most money in a limited amount of time
+      - 5 mins for Round 1, add 2.5 min each round
+   - In round 1, users start with £500 and are challenged to get to £2,500
    - At the end of the round, those who haven't met quota are eliminated.
-   - If everyone has met quota, the person with the least amount of money is eliminated. (Random choice for ties)
-   - Repeat until 1 player lasts. Max 4 rounds. Quota doubles each time. Money rolls over.
-
-## After 1.0.0
-
-- [ ] Update `utils.Pagination` to use Components v2 and allow for `ctx`.
-- [ ] Create a custom `help` command using `utils.Pagination`.
-- [ ] Write tests to use with `pytest` instead of winging it.
+      - If everyone has met quota, the person with the least amount of money is eliminated
+         - Random choice for ties
+   - Repeat until 1 player left
+   - Quota doubles each time
+   - Money rolls over round to round

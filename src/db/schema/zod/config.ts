@@ -1,10 +1,11 @@
 import * as z from "zod";
 
 export const ConfigKeys = {
+    BUCKET: "bucket",
     GUILD: "guild",
     ROLES: "roles",
     CHANNELS: "channels",
-    CATEGORIES: "categories",
+    CATEGORIES: "categories"
 } as const;
 
 export type ConfigKey = (typeof ConfigKeys)[keyof typeof ConfigKeys];
@@ -19,7 +20,10 @@ export function validateConfigValue(
 }
 
 const schemaMap = {
-    [ConfigKeys.GUILD]: z.object({ // pg is a pain
+    [ConfigKeys.BUCKET]: z.object({
+        baseUrl: z.string(),
+    }),
+    [ConfigKeys.GUILD]: z.object({
         id: z.string(),
     }),
     [ConfigKeys.ROLES]: z.object({
