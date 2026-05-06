@@ -168,6 +168,8 @@ async function schedulesTask(client: Client<true>) {
     })
 }
 
+// TODO: Schedule commands
+
 export async function setup(client: Client<true>) {
     await schedulesTask(client);
     const schedulesTaskId = setInterval(() => schedulesTask(client), 15 * 60 * 1000);

@@ -34,6 +34,8 @@ const schemaMap = {
     }),
     [ConfigKeys.CHANNELS]: z.object({
         specials: z.string(),
+        newMembers: z.string(),
+        rules: z.string(),
     }),
     [ConfigKeys.CATEGORIES]: z.object({
         other: z.string(),
