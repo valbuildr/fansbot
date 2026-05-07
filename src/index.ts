@@ -21,6 +21,12 @@ client.once(Events.ClientReady, async (readyClient) => {
             });
         }
 
+        if (e.contextMenus) {
+            e.contextMenus.forEach((cmd) => {
+                client.addContextMenu(cmd);
+            });
+        }
+
         if (e.setup) {
             await e.setup(readyClient as Client<true>);
         }

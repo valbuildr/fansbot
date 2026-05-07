@@ -1,17 +1,21 @@
 import { Client as DClient, GatewayIntentBits, Collection, Events, MessageFlags } from "discord.js";
-import type { SlashCommandData, TextCommandData } from "./commandTypes";
+import type { SlashCommandData, TextCommandData, ContextMenuData } from "@/ext";
 import db from "@/db";
 
 export default class Client<Ready extends boolean = boolean> extends DClient<Ready> {
     public database = db;
     public slashCommands = new Collection<string, SlashCommandData>();
     public textCommands = new Collection<string, TextCommandData>();
+    public contextMenus = new Collection<string, ContextMenuData>();
 
     public addSlashCommand(cmd: SlashCommandData) {
         this.slashCommands.set(cmd.data.name, cmd);
     }
     public addTextCommand(cmd: TextCommandData) {
         this.textCommands.set(cmd.data.trigger, cmd);
+    }
+    public addContextMenu(cmd: ContextMenuData) {
+        this.contextMenus.set(cmd.data.name, cmd);
     }
 
     constructor() {
@@ -22,6 +26,30 @@ export default class Client<Ready extends boolean = boolean> extends DClient<Rea
         this.on(Events.InteractionCreate, async (interaction) => {
             if (interaction.isChatInputCommand()) {
                 const cmd = this.slashCommands.get(interaction.commandName);
+
+                if (!cmd) {
+                    console.error(`No command matching ${interaction.commandName} was found.`);
+                    return;
+                }
+
+                try {
+                    await cmd.execute(interaction);
+                } catch (error) {
+                    console.error(error);
+                    if (interaction.replied || interaction.deferred) {
+                        await interaction.followUp({
+                            content: 'There was an error while executing this command!',
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: 'There was an error while executing this command!',
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    }
+                }
+            } else if (interaction.isContextMenuCommand()) {
+                const cmd = this.contextMenus.get(interaction.commandName);
 
                 if (!cmd) {
                     console.error(`No command matching ${interaction.commandName} was found.`);

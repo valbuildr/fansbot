@@ -1,5 +1,5 @@
 import Client from "@/utils/Client";
-import type { SlashCommandData } from "@/utils/commandTypes";
+import type { SlashCommandData } from "@/ext";
 import db from "@/db";
 import * as schema from "@/db/schema";
 import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, GuildMember, InteractionContextType, Message, MessageFlags, SlashCommandBuilder } from "discord.js";

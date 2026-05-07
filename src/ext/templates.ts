@@ -1,4 +1,4 @@
-import type { SlashCommandData } from "@/utils/commandTypes";
+import type { SlashCommandData } from "@/ext";
 import { isMod } from "@/utils/staffCheck";
 import { ActionRowBuilder, AllowedMentionsTypes, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelType, Colors, ComponentType, EmbedBuilder, EntryPointCommandHandlerType, InteractionContextType, Message, MessageFlags, ModalBuilder, SlashCommandBuilder, StringSelectMenuOptionBuilder, TextInputStyle, type GuildTextBasedChannel, type MessageCreateOptions } from "discord.js";
 import { MessageDataSchema, type MessageData } from "@/db/schema/zod/template";
