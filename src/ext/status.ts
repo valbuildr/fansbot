@@ -182,13 +182,10 @@ export const slashCommands: SlashCommandData[] = [
                             await interaction.reply("No entries match the selected filters.");
                             return;
                         } else {
-                            const p = new Pagination(interaction, { limit: 10 })
+                            new Pagination(interaction, { limit: 10 })
                                 .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() ?? interaction.guild.iconURL()! })
                                 .setTitle("🔍 Status Entry Query")
                                 .setColor(Colors.Blue)
-                                // .setFooter(
-                                //     { text: `${q.length} entries found` }
-                                // )
                                 .setFields(q.map((en) => {
                                     return {
                                         name: `\`${en.id}\``,
@@ -227,12 +224,24 @@ export const slashCommands: SlashCommandData[] = [
                                 .setColor(Colors.Yellow)
                                 .setTimestamp()
                                 .addFields(
-                                    { name: "Old Name", value: q[0]?.name ?? "", inline: true },
-                                    { name: "Old Type", value: typeDisplay(q[0]?.type ?? "playing"), inline: true },
-                                    { name: "Old Name", value: fullDisplay(q[0]?.name ?? "", q[0]?.type ?? "playing"), inline: true },
-                                    { name: "New Name", value: u[0]?.name ?? "", inline: true },
-                                    { name: "New Type", value: typeDisplay(u[0]?.type ?? "playing"), inline: true },
-                                    { name: "New Name", value: fullDisplay(u[0]?.name ?? "", u[0]?.type ?? "playing"), inline: true },
+                                    {
+                                        name: "Before",
+                                        value: [
+                                            `>>> **Name:** ${q[0]?.name ?? ""}`,
+                                            `**Type:** ${typeDisplay(q[0]?.type ?? "playing")}`,
+                                            `**Display:** ${fullDisplay(q[0]?.name ?? "", q[0]?.type ?? "playing")}`,
+                                        ].join("\n"),
+                                        inline: true
+                                    },
+                                    {
+                                        name: "After",
+                                        value: [
+                                            `>>> **Name:** ${u[0]?.name ?? ""}`,
+                                            `**Type:** ${typeDisplay(u[0]?.type ?? "playing")}`,
+                                            `**Display:** ${fullDisplay(u[0]?.name ?? "", u[0]?.type ?? "playing")}`,
+                                        ].join("\n"),
+                                        inline: true
+                                    },
                                 );
 
                             await interaction.reply({ embeds: [e] });
