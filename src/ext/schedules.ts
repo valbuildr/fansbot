@@ -4,8 +4,7 @@ import { ButtonStyle, ContainerBuilder, MediaGalleryItemBuilder, MessageFlags, t
 import db from "@/db";
 import { getOrFetchGuild, getOrFetchGuildChannel, getOrFetchGuildMessage } from "@/utils/getOrFetch";
 import { getConfig } from "@/utils/config";
-import { ConfigKeys, getSchemaForKey } from "@/db/schema/zod/config";
-import * as z from "zod";
+import { ConfigKeys, type Bucket, type Guild } from "@/db/schema/zod/config";
 import { eq } from "drizzle-orm";
 
 type Channel = typeof schema.channel.$inferSelect;
@@ -14,9 +13,7 @@ async function formatSchedule(
     channel: Channel,
     events: any[]
 ) {
-    const bucketConfigType = getSchemaForKey(ConfigKeys.BUCKET);
-    type BucketConfig = z.infer<typeof bucketConfigType>;
-    const bucketConfig = (await getConfig(ConfigKeys.BUCKET)) as BucketConfig;
+    const bucketConfig = (await getConfig(ConfigKeys.BUCKET)) as Bucket;
 
     const now = new Date();
 
@@ -80,9 +77,6 @@ async function formatSchedule(
 }
 
 async function schedulesTask(client: Client<true>) {
-    const guildSchema = getSchemaForKey(ConfigKeys.GUILD);
-    type Guild = z.infer<typeof guildSchema>;
-
     const config = {
         guild: (await getConfig(ConfigKeys.GUILD)) as Guild,
     }

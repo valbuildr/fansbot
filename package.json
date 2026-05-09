@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "main": "bun .",
-    "dev": "bun --hot .",
     "sync": "bun src/sync.ts",
     "db:push": "bunx drizzle-kit push",
     "db:studio": "bunx drizzle-kit studio"

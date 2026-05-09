@@ -30,6 +30,7 @@ import * as specials from "./specials";
 import * as schedules from "./schedules";
 import * as memberAnnouncements from "./memberAnnouncements";
 import * as templates from "./templates";
+import * as tickets from "./tickets";
 
 const extFiles: Record<string, ExtFile> = {
     status,
@@ -37,6 +38,7 @@ const extFiles: Record<string, ExtFile> = {
     schedules,
     memberAnnouncements,
     templates,
+    tickets
 };
 
 export default extFiles;

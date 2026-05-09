@@ -8,14 +8,14 @@ export default class Client<Ready extends boolean = boolean> extends DClient<Rea
     public textCommands = new Collection<string, TextCommandData>();
     public contextMenus = new Collection<string, ContextMenuData>();
 
-    public addSlashCommand(cmd: SlashCommandData) {
-        this.slashCommands.set(cmd.data.name, cmd);
+    public addSlashCommand(data: SlashCommandData) {
+        this.slashCommands.set(data.data.name, data);
     }
-    public addTextCommand(cmd: TextCommandData) {
-        this.textCommands.set(cmd.data.trigger, cmd);
+    public addTextCommand(data: TextCommandData) {
+        this.textCommands.set(data.data.trigger, data);
     }
-    public addContextMenu(cmd: ContextMenuData) {
-        this.contextMenus.set(cmd.data.name, cmd);
+    public addContextMenu(data: ContextMenuData) {
+        this.contextMenus.set(data.data.name, data);
     }
 
     constructor() {

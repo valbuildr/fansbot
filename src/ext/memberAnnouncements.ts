@@ -1,20 +1,15 @@
 import Client from "@/utils/Client";
 import { Colors, EmbedBuilder, Events, time, TimestampStyles } from "discord.js";
 import { getConfig } from "@/utils/config";
-import { ConfigKeys, getSchemaForKey } from "@/db/schema/zod/config";
+import { ConfigKeys, type Channels, type Guild } from "@/db/schema/zod/config";
 import * as z from "zod";
 import { getOrFetchGuild, getOrFetchGuildChannel } from "@/utils/getOrFetch";
 
 function addMemberEvent(client: Client<true>) {
     client.on(Events.GuildMemberAdd, async (member) => {
-        const channelsConfigType = getSchemaForKey(ConfigKeys.CHANNELS);
-        const guildConfigType = getSchemaForKey(ConfigKeys.GUILD);
-        type ChannelsConfig = z.infer<typeof channelsConfigType>;
-        type GuildConfig = z.infer<typeof guildConfigType>;
-
         const config = {
-            guild: (await getConfig(ConfigKeys.GUILD)) as GuildConfig,
-            channels: (await getConfig(ConfigKeys.CHANNELS)) as ChannelsConfig
+            guild: (await getConfig(ConfigKeys.GUILD)) as Guild,
+            channels: (await getConfig(ConfigKeys.CHANNELS)) as Channels
         };
 
         const guild = await getOrFetchGuild(client.guilds, config.guild.id);
@@ -42,14 +37,9 @@ function addMemberEvent(client: Client<true>) {
 
 function removeMemberEvent(client: Client<true>) {
     client.on(Events.GuildMemberRemove, async (member) => {
-        const channelsConfigType = getSchemaForKey(ConfigKeys.CHANNELS);
-        const guildConfigType = getSchemaForKey(ConfigKeys.GUILD);
-        type ChannelsConfig = z.infer<typeof channelsConfigType>;
-        type GuildConfig = z.infer<typeof guildConfigType>;
-
         const config = {
-            guild: (await getConfig(ConfigKeys.GUILD)) as GuildConfig,
-            channels: (await getConfig(ConfigKeys.CHANNELS)) as ChannelsConfig
+            guild: (await getConfig(ConfigKeys.GUILD)) as Guild,
+            channels: (await getConfig(ConfigKeys.CHANNELS)) as Channels
         };
 
         const guild = await getOrFetchGuild(client.guilds, config.guild.id);

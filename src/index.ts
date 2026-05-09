@@ -8,7 +8,6 @@ client.once(Events.ClientReady, async (readyClient) => {
     console.log(`Logged in as ${readyClient.user.username}`);
 
     Object.entries(ext).forEach(async ([k, e]) => {
-        console.log(`Loading ${k} extension...`);
         if (e.slashCommands) {
             e.slashCommands.forEach((cmd) => {
                 client.addSlashCommand(cmd);
