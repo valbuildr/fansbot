@@ -1,58 +1,159 @@
-# BBC Fans Bot (fansbot)
+# Turborepo starter
 
-A bot meant to aid in upkeeping the [BBC Fans Discord server](https://discord.gg/BNdm8gmRPN).
+This Turborepo starter is maintained by the Turborepo core team.
 
-## Compatibility
+## Using this example
 
-### Python Version
+Run the following command:
 
-| Version               | Status         |
-| :-------------------- | :------------- |
-| 3.13.3                | 🔵 Recommended |
-| 3.14.x                | 🔴 Unsupported |
-| 3.13.x (excl. 3.13.3) | 🟡 Untested    |
-| 3.12.x                | 🟡 Untested    |
-| 3.11.x                | 🟡 Untested    |
-| 3.10.x                | 🟡 Untested    |
-| 3.9.x                 | 🟡 Untested    |
-| 3.8.x (and lower)     | 🔴 Unsupported |
+```sh
+npx create-turbo@latest
+```
 
-- 🔵 Recommended: Same as Confirmed.
-- 🟢 Confirmed: Tested and confirmed to work, issues will be fixed
-- 🟡 Untested: Untested, issues will be fixed
-- 🔴 Unsupported: Untested, issues may or may not be fixed
+## What's inside?
 
-## License
+This Turborepo includes the following packages/apps:
 
-Distributed under the MIT License. See `LICENSE` for more information.
+### Apps and Packages
 
-## Hosting
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
-1. Download the source code from the [Releases page](https://github.com/valbuildr/fansbot/releases). (You can also get the latest code changes [here](https://github.com/valbuildr/fansbot/archive/refs/heads/main.zip). Expect more bugs with that.)
-2. Ensure you have Python 3.13.3 (or another supported Python version) and Docker/Docker Compose installed.
-3. Fill out `src/config.example.py` and rename it to `config.py`.
-4. Fill out `docker-compose.example.yml` and rename it to `docker-compose.yml`.
-5. Start the database server with `docker compose up`.
-6. (Optional, but recommended) Create a virtual environment with `python3 -m venv .venv/` and [activate it](https://docs.python.org/3/library/venv.html#how-venvs-work).
-7. Install the required packages with pip. (`python3 -m pip install -r requirements.txt`)
-8. Run the bot with `python3 src/main.py`.
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-## Artificial Intelligence
+### Utilities
 
-This project uses Artificial Intelligence (AI) as an aid, but not a replacement.
+This Turborepo has some additional tools already setup for you:
 
-Contributors should also use this mentality, if they choose to use AI.
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
 
-## Issues
+### Build
 
-If you have any issues with the software, please first look at the compatibility table above. If you are on a supported platform/software version (this includes untested), please open an issue and I will do my best to implement a fix. (if you know how to code in Python, and you want to take a crack at it, feel free to also open a pull request too!) If you are on an unsupported platform, I will not implement a fix myself. If you create a pull request with code to fix an issue on an unsupported platform, I will probably merge it.
+To build all apps and packages, run the following command:
 
-## Contributions
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
 
-Contributors should **always** follow the [Contributor Code of Conduct](./CONTRIBUTOR_COC.md), and the guidance of using AI tools above.
+```sh
+cd my-turborepo
+turbo build
+```
 
-Violating either are grounds for a ban on contributing to any of my projects in the future.
+Without global `turbo`, use your package manager:
 
-## Future Features
+```sh
+cd my-turborepo
+npx turbo build
+bun dlx turbo build
+bun exec turbo build
+```
 
-All planned/proposed new features are on [this](https://github.com/users/valbuildr/projects/2) Github Project.
+You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+
+```sh
+turbo build --filter=docs
+```
+
+Without global `turbo`:
+
+```sh
+npx turbo build --filter=docs
+bun exec turbo build --filter=docs
+bun exec turbo build --filter=docs
+```
+
+### Develop
+
+To develop all apps and packages, run the following command:
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+
+```sh
+cd my-turborepo
+turbo dev
+```
+
+Without global `turbo`, use your package manager:
+
+```sh
+cd my-turborepo
+npx turbo dev
+bun exec turbo dev
+bun exec turbo dev
+```
+
+You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+
+```sh
+turbo dev --filter=web
+```
+
+Without global `turbo`:
+
+```sh
+npx turbo dev --filter=web
+bun exec turbo dev --filter=web
+bun exec turbo dev --filter=web
+```
+
+### Remote Caching
+
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+
+Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+
+```sh
+cd my-turborepo
+turbo login
+```
+
+Without global `turbo`, use your package manager:
+
+```sh
+cd my-turborepo
+npx turbo login
+bun exec turbo login
+bun exec turbo login
+```
+
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+
+```sh
+turbo link
+```
+
+Without global `turbo`:
+
+```sh
+npx turbo link
+bun exec turbo link
+bun exec turbo link
+```
+
+## Useful Links
+
+Learn more about the power of Turborepo:
+
+- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
+- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
+- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
+- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
+- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
+- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)

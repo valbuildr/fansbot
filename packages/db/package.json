@@ -1,0 +1,30 @@
+{
+    "name": "@fansbot/db",
+    "version": "0.0.0",
+    "private": true,
+    "exports": {
+        ".": "./src/index.ts",
+        "./schema": "./src/schema/index.ts",
+        "./schema/zod": "./src/schema/zod/index.ts"
+    },
+    "scripts": {
+        "lint": "eslint . --max-warnings 0",
+        "check-types": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@fansbot/eslint-config": "*",
+        "@fansbot/typescript-config": "*",
+        "@types/pg": "^8.20.0",
+        "drizzle-kit": "^0.31.10",
+        "eslint": "^9.39.1",
+        "tsx": "^4.21.0",
+        "typescript": "5.9.2"
+    },
+    "dependencies": {
+        "@fansbot/snowflake": "workspace:*",
+        "dotenv": "^17.4.2",
+        "drizzle-orm": "^0.45.2",
+        "pg": "^8.20.0",
+        "zod": "^4.4.3"
+    }
+}

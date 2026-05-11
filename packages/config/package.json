@@ -1,0 +1,22 @@
+{
+    "name": "@fansbot/config",
+    "version": "0.0.0",
+    "private": true,
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "lint": "eslint . --max-warnings 0",
+        "check-types": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@fansbot/eslint-config": "*",
+        "@fansbot/typescript-config": "*",
+        "eslint": "^9.39.1",
+        "typescript": "5.9.2"
+    },
+    "dependencies": {
+        "@fansbot/db": "workspace:*",
+        "drizzle-orm": "^0.45.2"
+    }
+}
