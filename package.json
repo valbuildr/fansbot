@@ -2,11 +2,11 @@
   "name": "fansbot",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "turbo:build": "turbo run build",
+    "turbo:dev": "turbo run dev",
+    "turbo:lint": "turbo run lint",
+    "turbo:format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "turbo:check-types": "turbo run check-types"
   },
   "devDependencies": {
     "@turbo/gen": "^2.9.12",
