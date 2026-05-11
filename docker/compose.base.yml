@@ -1,4 +1,5 @@
 services:
+  # TODO: Automated deployment
   # postgres db
   db:
     container_name: fansbot_db
