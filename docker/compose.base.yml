@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: fansbot
+      POSTGRES_PASSWORD: verysecurepassword
       POSTGRES_DB: fansbot
     volumes:
       - fansbot_db_data:/var/lib/postgresql
