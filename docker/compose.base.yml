@@ -1,6 +1,7 @@
 services:
   # postgres db
   db:
+    container_name: fansbot_db
     image: postgres:latest
     restart: unless-stopped
     environment:
@@ -9,6 +10,14 @@ services:
       POSTGRES_DB: fansbot
     volumes:
       - fansbot_db_data:/var/lib/postgresql
+  # redis for communication
+  redis:
+    container_name: fansbot_redis
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - fansbot_redis_data:/var/lib/postgresql
 
 volumes:
   fansbot_db_data:
+  fansbot_redis_data:

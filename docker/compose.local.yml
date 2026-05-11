@@ -11,6 +11,15 @@ services:
       - "5432:5432"
     volumes:
       - fansbot_db_data:/var/lib/postgresql
+  # redis for communication
+  redis:
+    container_name: fansbot_redis
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - fansbot_redis_data:/var/lib/postgresql
 
 volumes:
   fansbot_db_data:
