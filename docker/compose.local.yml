@@ -1,0 +1,16 @@
+services:
+  # postgres db
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fansbot
+      POSTGRES_DB: fansbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - fansbot_db_data:/var/lib/postgresql
+
+volumes:
+  fansbot_db_data:
