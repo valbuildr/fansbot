@@ -1,7 +1,7 @@
 import { PlopTypes } from "@turbo/gen";
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
-  plop.setGenerator("mkpkg", {
+  plop.setGenerator("pkg", {
     description:
       "Creates a new packaage and sets up eslint.",
     prompts: [
@@ -56,7 +56,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       }
     ]
   });
-  plop.setGenerator("mkapp", {
+  plop.setGenerator("app", {
     description:
       "Creates a new app and sets up eslint.",
     prompts: [
