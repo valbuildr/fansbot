@@ -1,22 +1,30 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
-  "globalEnv": ["DATABASE_URL"],
+  "globalEnv": [
+    "DISCORD_TOKEN",
+    "DISCORD_CLIENT_ID",
+    "DISCORD_CLIENT_SECRET",
+    "DATABASE_URL",
+    "REDIS_SECRET",
+    "BETTER_AUTH_SECRET"
+  ],
   "tasks": {
-    "build": {
+    "turbo:build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "lint": {
+    "turbo:lint": {
       "dependsOn": ["^lint"]
     },
-    "check-types": {
+    "turbo:check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev": {
+    "turbo:dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "dev": {}
   }
 }
