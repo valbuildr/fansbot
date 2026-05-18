@@ -25,20 +25,22 @@ export type ExtFile = {
     setup?: (client: Client<true>) => Promise<any>;
 }
 
-// import * as status from "./status";
-// import * as specials from "./specials";
-// import * as schedules from "./schedules";
-// import * as memberAnnouncements from "./memberAnnouncements";
-// import * as templates from "./templates";
-// import * as tickets from "./tickets";
+import * as status from "./status";
+import * as specials from "./specials";
+import * as schedules from "./schedules";
+import * as memberAnnouncements from "./memberAnnouncements";
+import * as templates from "./templates";
+import * as tickets from "./tickets";
+import * as utility from "./utility";
 
 const extFiles: Record<string, ExtFile> = {
-    // status,
-    // specials,
-    // schedules,
-    // memberAnnouncements,
-    // templates,
-    // tickets
+    status,
+    specials,
+    schedules,
+    memberAnnouncements,
+    templates,
+    tickets,
+    utility,
 };
 
 export default extFiles;
