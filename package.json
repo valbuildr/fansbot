@@ -6,7 +6,11 @@
     "turbo:dev": "turbo run dev",
     "turbo:lint": "turbo run lint",
     "turbo:format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "turbo:check-types": "turbo run check-types"
+    "turbo:check-types": "turbo run check-types",
+    "db:studio": "cd packages/db && bun run drizzle-kit studio --config ./src/drizzle.config.ts",
+    "db:push": "cd packages/db && bun run drizzle-kit push --config ./src/drizzle.config.ts",
+    "bot:main": "cd apps/bot && bun run main",
+    "bot:sync": "cd apps/bot && bun run sync"
   },
   "devDependencies": {
     "@turbo/gen": "^2.9.12",
