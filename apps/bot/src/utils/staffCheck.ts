@@ -2,10 +2,6 @@ import { GuildMemberRoleManager } from "discord.js";
 import { getConfig } from "@fansbot/config";
 import * as zodSchema from "@fansbot/db/schema/zod";
 
-async function configCheck(config: zodSchema.Roles): Promise<zodSchema.Roles> {
-    return config ?? await getConfig<zodSchema.Roles>(zodSchema.ConfigKeys.ROLES);
-}
-
 export async function isMod(roles: GuildMemberRoleManager | string[]) {
     const config = await getConfig<zodSchema.Roles>(zodSchema.ConfigKeys.ROLES);
     if (!config) return false;
