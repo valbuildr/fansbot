@@ -2,7 +2,7 @@ import Client from "../utils/Client";
 import type { SlashCommandData } from "../ext";
 import db from "@fansbot/db";
 import * as schema from "@fansbot/db/schema";
-import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, GuildMember, InteractionContextType, Message, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, GuildMember, InteractionContextType, Message, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { isMod } from "../utils/staffCheck";
 import { eq } from "drizzle-orm";
 import { Pagination } from "pagination.djs";
@@ -39,6 +39,7 @@ export const slashCommands: SlashCommandData[] = [
             .setName("status")
             .setDescription("Status management")
             .setContexts(InteractionContextType.Guild)
+            .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
             .addSubcommand(s =>
                 s.setName("create")
                     .setDescription("Mod: Create a new status entry.")

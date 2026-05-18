@@ -1,6 +1,6 @@
 import type { SlashCommandData } from "../ext";
 import { isMod } from "../utils/staffCheck";
-import { ActionRowBuilder, AllowedMentionsTypes, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelType, Colors, ComponentType, EmbedBuilder, EntryPointCommandHandlerType, InteractionContextType, Message, MessageFlags, ModalBuilder, SlashCommandBuilder, StringSelectMenuOptionBuilder, TextInputStyle, type GuildTextBasedChannel, type MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, AllowedMentionsTypes, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelType, Colors, ComponentType, EmbedBuilder, EntryPointCommandHandlerType, InteractionContextType, Message, MessageFlags, ModalBuilder, PermissionFlagsBits, SlashCommandBuilder, StringSelectMenuOptionBuilder, TextInputStyle, type GuildTextBasedChannel, type MessageCreateOptions } from "discord.js";
 import * as zodSchema from "@fansbot/db/schema/zod";
 import db from "@fansbot/db";
 import * as schema from "@fansbot/db/schema";
@@ -14,6 +14,7 @@ export const slashCommands: SlashCommandData[] = [
             .setName("template")
             .setDescription("Message template commands")
             .setContexts(InteractionContextType.Guild)
+            .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
             .addSubcommand(s =>
                 s.setName("create")
                     .setDescription("Mod: Create a new message template.")
@@ -47,7 +48,7 @@ export const slashCommands: SlashCommandData[] = [
             )
             .addSubcommand(s =>
                 s.setName("preview")
-                    .setDescription("Mod: PReview a message template.")
+                    .setDescription("Mod: Preview a message template.")
                     .addStringOption(o =>
                         o.setName("id")
                             .setDescription("The ID of the message template.")
@@ -56,7 +57,7 @@ export const slashCommands: SlashCommandData[] = [
             )
             .addSubcommand(s =>
                 s.setName("send")
-                    .setDescription("Mod: PReview a message template.")
+                    .setDescription("Mod: Send a message template.")
                     .addStringOption(o =>
                         o.setName("id")
                             .setDescription("The ID of the message template.")
