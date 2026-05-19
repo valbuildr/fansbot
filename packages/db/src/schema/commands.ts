@@ -7,4 +7,4 @@ export const command = p.pgTable(
         id: p.text("id").notNull().unique(),
         data: p.json("data").notNull(),
     }
-)
+).enableRLS();
