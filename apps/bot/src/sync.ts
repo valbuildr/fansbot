@@ -22,7 +22,7 @@ try {
         const q = await db.query.command.findFirst({ where: eq(schema.command.name, item.name) });
 
         if (q) {
-            await db.update(schema.command).set({ name: item.name, id: item.id, data: item });
+            await db.update(schema.command).set({ name: item.name, id: item.id, data: item }).where(eq(schema.command.name, item.name));
         } else {
             await db.insert(schema.command).values({ name: item.name, id: item.id, data: item });
         }
