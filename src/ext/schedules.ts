@@ -1,5 +1,4 @@
 import * as discord from "discord.js"
-import getAppEmoji from "../utils/getAppEmoji";
 import Client from "../utils/Client";
 import { readFromStorage, writeToStorage } from "../utils/simpleDataStorage";
 
@@ -746,7 +745,7 @@ async function fmtSchedule(client: Client<true>, schedule: IblResponse, channelC
         .sort((a, b) => startOf(a).getTime() - startOf(b).getTime())
         .slice(0, MAX_UPCOMING);
 
-    const liveEmoji = await getAppEmoji(client, "blueLivePulse");
+    const liveEmoji = await client.getEmoji("blueLivePulse");
 
     const lines = [
         ...current.map(
@@ -767,7 +766,7 @@ async function fmtSchedule(client: Client<true>, schedule: IblResponse, channelC
         );
     }
 
-    const emoji = await getAppEmoji(client, "favicon");
+    const emoji = await client.getEmoji("favicon");
 
     const schedButton = new discord.ButtonBuilder()
         .setLabel("Open")

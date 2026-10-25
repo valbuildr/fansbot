@@ -22,6 +22,23 @@ export default class Client<Ready extends boolean = boolean> extends discord.Cli
     public constantButtons = new discord.Collection<string, ConstantButtonData>();
     public db = drizzle(process.env.DATABASE_URL!);
 
+    public async getEmoji(name: string) {
+        if (!this.application) return;
+        try {
+            const appEmojis = await this.application.emojis.fetch();
+
+            const targetEmoji = appEmojis.find(emoji => emoji.name === name);
+
+            if (targetEmoji) {
+                return targetEmoji;
+            } else {
+                console.log(`Could not find an application emoji named: ${name}`);
+            }
+        } catch (error) {
+            console.error('Failed to fetch application emojis:', error);
+        }
+    }
+
     constructor() {
         super({
             intents: [
