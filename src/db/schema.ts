@@ -17,4 +17,5 @@ export const modAction = p.pgTable("mod_action", {
     createdAt: p.timestamp("created_at", { precision: 6, withTimezone: true }).notNull().defaultNow(),
     isActive: p.boolean("is_active").notNull().default(true),
     expiresAt: p.timestamp("expires_at", { precision: 6, withTimezone: true }),
+    pointMultiplier: p.numeric("point_multiplier").notNull().default("1"),
 });

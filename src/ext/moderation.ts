@@ -32,6 +32,69 @@ const standingPointValues = {
     MUTE: 3,
     KICK: 4,
     BAN: 10,
+};
+
+const standingEmojiNames = {
+    FAIR: "statusFair",
+    BAD: "statusBad",
+    VERY_BAD: "statusVBad",
+    DANGEROUS: "statusDanger",
+};
+
+const standingColors = {
+    FAIR: discord.Colors.Green,
+    BAD: discord.Colors.Yellow,
+    VERY_BAD: discord.Colors.Orange,
+    DANGEROUS: discord.Colors.Red,
+};
+
+const standingNames = {
+    FAIR: "Fair",
+    BAD: "Bad",
+    VERY_BAD: "Very Bad",
+    DANGEROUS: "Dangerous",
+};
+
+async function fetchAccountStatus(client: Client, userId: string): Promise<{
+    status: "FAIR" | "BAD" | "VERY_BAD" | "DANGEROUS" | null;
+    points: number;
+}> {
+    const db = await client.db.select().from(modAction).where(eq(modAction.user, userId));
+
+    let points = 0;
+    db.forEach((action) => {
+        points += standingPointValues[action.type] * Number(action.pointMultiplier);
+    });
+    points = Math.round(points);
+
+    let status: "FAIR" | "BAD" | "VERY_BAD" | "DANGEROUS" | null = null
+
+    if (points <= 4) status = "FAIR";
+    if (points >= 5 && points <= 9) status = "BAD";
+    if (points >= 10 && points <= 14) status = "VERY_BAD";
+    if (points >= 15) status = "DANGEROUS";
+
+    return { status, points };
+}
+
+function calculateAccountStatus(actions: ModAction[]): {
+    status: "FAIR" | "BAD" | "VERY_BAD" | "DANGEROUS" | null;
+    points: number;
+} {
+    let points = 0;
+    actions.forEach((action) => {
+        points += standingPointValues[action.type] * Number(action.pointMultiplier);
+    });
+    points = Math.round(points);
+
+    let status: "FAIR" | "BAD" | "VERY_BAD" | "DANGEROUS" | null = null
+
+    if (points <= 4) status = "FAIR";
+    if (points >= 5 && points <= 9) status = "BAD";
+    if (points >= 10 && points <= 14) status = "VERY_BAD";
+    if (points >= 15) status = "DANGEROUS";
+
+    return { status, points };
 }
 
 async function buildActionDetails(action: ModAction) {
@@ -144,46 +207,9 @@ const slashCommands: SlashCommandData[] = [
                 )
             }
 
-            // determine account standing
-            let standingScore = 0;
+            const standing = await fetchAccountStatus(client, user.id);
 
-            // warning    1pt
-            standingScore += activeWarnings.length * standingPointValues.WARN;
-            // mute       3pts
-            standingScore += activeMutes.length * standingPointValues.MUTE;
-            // kick       5pts
-            standingScore += activeKicks.length * standingPointValues.KICK;
-            // ban        10pts
-            standingScore += activeBans.length * standingPointValues.BAN;
-
-            // fair       0-4 pts
-            // bad        5-9 pts
-            // very bad   10-14 pts
-            // dangerous  15+ pts
-
-            let standingEmojiName = "";
-            let standingColor: number = discord.Colors.Blurple;
-            let standing = "";
-
-            if (standingScore < 5) {
-                standingEmojiName = "statusFair";
-                standingColor = discord.Colors.Green;
-                standing = "Fair";
-            } else if (standingScore > 4 && standingScore < 10) {
-                standingEmojiName = "statusBad";
-                standingColor = discord.Colors.Yellow;
-                standing = "Bad";
-            } else if (standingScore > 9 && standingScore < 15) {
-                standingEmojiName = "statusVBad";
-                standingColor = discord.Colors.Orange;
-                standing = "Very Bad";
-            } else if (standingScore > 15) {
-                standingEmojiName = "statusDanger";
-                standingColor = discord.Colors.Red;
-                standing = "Dangerous";
-            }
-
-            const standingEmoji = await client.getEmoji(standingEmojiName);
+            const standingEmoji = await client.getEmoji(standingEmojiNames[standing.status!]);
 
             container.addSeparatorComponents(s => s.setSpacing(discord.SeparatorSpacingSize.Large));
             const standingButton = new discord.ButtonBuilder()
@@ -203,7 +229,7 @@ const slashCommands: SlashCommandData[] = [
                     s.addTextDisplayComponents(td =>
                         td.setContent([
                             `## Account Standing`,
-                            `<@${user.id}>'s account is in <${standingEmoji.animated ? "a" : ""}:${standingEmoji.name}:${standingEmoji.id}> **${standing}** condition, with ${standingScore} point(s).`
+                            `<@${user.id}>'s account is in <${standingEmoji.animated ? "a" : ""}:${standingEmoji.name}:${standingEmoji.id}> **${standingNames[standing.status!]}** condition, with ${standing.points} point(s).`
                         ].join("\n"))
                     )
                         .setButtonAccessory(standingButton)
@@ -213,13 +239,13 @@ const slashCommands: SlashCommandData[] = [
                     s.addTextDisplayComponents(td =>
                         td.setContent([
                             `## Account Standing`,
-                            `<@${user.id}>'s account is in **${standing}** condition, with ${standingScore} point(s).`
+                            `<@${user.id}>'s account is in **${standingNames[standing.status!]}** condition, with ${standing.points} point(s).`
                         ].join("\n"))
                     )
                         .setButtonAccessory(standingButton)
                 );
             }
-            container.setAccentColor(standingColor);
+            container.setAccentColor(standingColors[standing.status!]);
 
 
             container.addSeparatorComponents(s => s.setSpacing(discord.SeparatorSpacingSize.Large));
@@ -294,7 +320,7 @@ const slashCommands: SlashCommandData[] = [
                     }
                 } else if (i.customId.startsWith("standing-")) {
                     const activeLines = activeActions.map((action) => {
-                        return `- ${actionEmojis[action.type]} A **${actionNames[action.type]}** on ${discord.time(action.createdAt, discord.TimestampStyles.LongDate)} added ${standingPointValues[action.type]} point(s).`
+                        return `- ${actionEmojis[action.type]} A **${actionNames[action.type]}** on ${discord.time(action.createdAt, discord.TimestampStyles.LongDate)} added ${standingPointValues[action.type] * Number(action.pointMultiplier)} point(s).`
                     });
                     const linesSliced = activeLines.slice(0, 9);
                     const extraLines = activeLines.length - 9;
@@ -306,12 +332,12 @@ const slashCommands: SlashCommandData[] = [
                     }
 
                     const c = new discord.ContainerBuilder()
-                        .setAccentColor(standingColor)
+                        .setAccentColor(standingColors[standing.status!])
                         .addTextDisplayComponents(td => td.setContent(`# <@${user.id}>'s Account Status`))
                         .addMediaGalleryComponents(mg =>
-                            mg.addItems(mgi => mgi.setURL(`https://bucket-fansbot.valbuilds.xyz/account-status/${standingScore < 15 ? standingScore : '15'}.png`))
+                            mg.addItems(mgi => mgi.setURL(`https://bucket-fansbot.valbuilds.xyz/account-status/${standing.points < 15 ? standing.points : '15'}.png`))
                         )
-                        .addTextDisplayComponents(td => td.setContent(`<@${user.id}>'s account is in **${standing}** standing, with ${standingScore} point(s).`))
+                        .addTextDisplayComponents(td => td.setContent(`<@${user.id}>'s account is in **${standingNames[standing.status!]}** standing, with ${standing.points} point(s).`))
                         .addSeparatorComponents(s => s.setSpacing(discord.SeparatorSpacingSize.Large))
                         .addTextDisplayComponents(td => td.setContent([
                             "## Breakdown",
@@ -424,6 +450,46 @@ const slashCommands: SlashCommandData[] = [
                     .catch(() => { });
             });
         }
+    },
+    {
+        //@ts-ignore
+        data: new discord.SlashCommandBuilder()
+            .setName("account-status")
+            .setDescription("account status commands")
+            .addSubcommand(sc =>
+                sc.setName("look-up")
+                    .setDescription("Look up a user's account status.")
+                    .addUserOption(opt =>
+                        opt.setName("user")
+                            .setDescription("The user to look up.")
+                            .setRequired(true)
+                    )
+            )
+            .addSubcommand(sc =>
+                sc.setName("list")
+                    .setDescription("List all users with a specific status.")
+                    .addStringOption(opt =>
+                        opt.setName("status")
+                            .setDescription("The status to look up.")
+                            .setChoices(
+                                { name: "Fair", value: "fair" },
+                                { name: "Bad", value: "bad" },
+                                { name: "Very Bad", value: "verybad" },
+                                { name: "Dangerous", value: "dangerous" },
+                            )
+                            .setRequired(true)
+                    )
+                    .addBooleanOption(opt =>
+                        opt.setName("and-up")
+                            .setDescription("Whether or not to see users with higher statuses. Defaults to False.")
+                            .setRequired(false)
+                    )
+            )
+            .addSubcommand(sc =>
+                sc.setName("explaination")
+                    .setDescription("Explains what account status is and how to understand it.")
+            ),
+        async execute(interaction) { }
     }
 ];
 
