@@ -13,7 +13,7 @@ const ACTION_NAMES = {
     "BAN": "Ban",
 };
 
-const ACTIONS_EMOJIS = {
+const ACTION_EMOJIS = {
     "WARN": "⚠️",
     "MUTE": "🔇",
     "KICK": "👢",
@@ -119,7 +119,7 @@ async function buildActionDetails(action: ModAction) {
     const container = new discord.ContainerBuilder()
         .setAccentColor(ACTION_COLORS[action.type])
         .addTextDisplayComponents(td => td.setContent([
-            `# ${ACTIONS_EMOJIS[action.type]} Mod Action #${action.id}`,
+            `# ${ACTION_EMOJIS[action.type]} Mod Action #${action.id}`,
             ...details,
         ].join("\n")));
 
@@ -173,10 +173,10 @@ const slashCommands: SlashCommandData[] = [
                     s.addTextDisplayComponents(td =>
                         td.setContent([
                             `# <@${user.id}>'s Moderation Profile`,
-                            `${ACTIONS_EMOJIS.WARN} **${activeWarnings.length} active warning(s)** (${expiredWarnings.length} expired)`,
-                            `${ACTIONS_EMOJIS.MUTE} **${activeMutes.length} active mute(s)** (${expiredMutes.length} expired)`,
-                            `${ACTIONS_EMOJIS.KICK} **${activeKicks.length} active kick(s)** (${expiredKicks.length} expired)`,
-                            `${ACTIONS_EMOJIS.BAN} **${activeBans.length} active bans(s)** (${expiredBans.length} expired)`,
+                            `${ACTION_EMOJIS.WARN} **${activeWarnings.length} active warning(s)** (${expiredWarnings.length} expired)`,
+                            `${ACTION_EMOJIS.MUTE} **${activeMutes.length} active mute(s)** (${expiredMutes.length} expired)`,
+                            `${ACTION_EMOJIS.KICK} **${activeKicks.length} active kick(s)** (${expiredKicks.length} expired)`,
+                            `${ACTION_EMOJIS.BAN} **${activeBans.length} active bans(s)** (${expiredBans.length} expired)`,
                         ].join("\n"))
                     )
                         .setThumbnailAccessory(tb =>
@@ -191,7 +191,7 @@ const slashCommands: SlashCommandData[] = [
                     s.addTextDisplayComponents(td =>
                         td.setContent([
                             `## Most Recent Action`,
-                            `### ${ACTIONS_EMOJIS[mostRecent.type]} ${ACTION_NAMES[mostRecent.type]} #${mostRecent.id}`,
+                            `### ${ACTION_EMOJIS[mostRecent.type]} ${ACTION_NAMES[mostRecent.type]} #${mostRecent.id}`,
                             `>>> **Author:** <@${mostRecent.author}>`,
                             `**Reason:** ${mostRecent.reason}`,
                             `**Created:** ${discord.time(mostRecent.createdAt, discord.TimestampStyles.LongDateShortTime)} (${discord.time(mostRecent.createdAt, discord.TimestampStyles.RelativeTime)})`,
@@ -201,7 +201,7 @@ const slashCommands: SlashCommandData[] = [
                             new discord.ButtonBuilder()
                                 .setCustomId(`latest-${mostRecent.id}`)
                                 .setLabel("More Details")
-                                .setEmoji(ACTIONS_EMOJIS[mostRecent.type])
+                                .setEmoji(ACTION_EMOJIS[mostRecent.type])
                                 .setStyle(discord.ButtonStyle.Secondary)
                         )
                 )
@@ -254,25 +254,25 @@ const slashCommands: SlashCommandData[] = [
                     .addComponents(
                         new discord.ButtonBuilder()
                             .setCustomId(`warns-${user.id}`)
-                            .setEmoji(ACTIONS_EMOJIS.WARN)
+                            .setEmoji(ACTION_EMOJIS.WARN)
                             .setLabel("See all Warnings")
                             .setDisabled(warnings.length <= 0)
                             .setStyle(discord.ButtonStyle.Secondary),
                         new discord.ButtonBuilder()
                             .setCustomId(`mutes-${user.id}`)
-                            .setEmoji(ACTIONS_EMOJIS.MUTE)
+                            .setEmoji(ACTION_EMOJIS.MUTE)
                             .setLabel("See all Mutes")
                             .setDisabled(mutes.length <= 0)
                             .setStyle(discord.ButtonStyle.Secondary),
                         new discord.ButtonBuilder()
                             .setCustomId(`kicks-${user.id}`)
-                            .setEmoji(ACTIONS_EMOJIS.KICK)
+                            .setEmoji(ACTION_EMOJIS.KICK)
                             .setLabel("See all Kicks")
                             .setDisabled(kicks.length <= 0)
                             .setStyle(discord.ButtonStyle.Secondary),
                         new discord.ButtonBuilder()
                             .setCustomId(`bans-${user.id}`)
-                            .setEmoji(ACTIONS_EMOJIS.BAN)
+                            .setEmoji(ACTION_EMOJIS.BAN)
                             .setLabel("See all Bans")
                             .setDisabled(bans.length <= 0)
                             .setStyle(discord.ButtonStyle.Secondary),
@@ -320,7 +320,7 @@ const slashCommands: SlashCommandData[] = [
                     }
                 } else if (i.customId.startsWith("standing-")) {
                     const activeLines = activeActions.map((action) => {
-                        return `- ${ACTIONS_EMOJIS[action.type]} A **${ACTION_NAMES[action.type]}** on ${discord.time(action.createdAt, discord.TimestampStyles.LongDate)} added ${STANDING_POINT_VALUES[action.type] * Number(action.pointMultiplier)} point(s).`
+                        return `- ${ACTION_EMOJIS[action.type]} A **${ACTION_NAMES[action.type]}** on ${discord.time(action.createdAt, discord.TimestampStyles.LongDate)} added ${STANDING_POINT_VALUES[action.type] * Number(action.pointMultiplier)} point(s).`
                     });
                     const linesSliced = activeLines.slice(0, 9);
                     const extraLines = activeLines.length - 9;
@@ -365,7 +365,7 @@ const slashCommands: SlashCommandData[] = [
                     const c = new discord.ContainerBuilder()
                         .setAccentColor(ACTION_COLORS.WARN)
                         .addTextDisplayComponents(td => td.setContent([
-                            `# ${ACTIONS_EMOJIS.WARN} <@${user.id}>'s Warnings`,
+                            `# ${ACTION_EMOJIS.WARN} <@${user.id}>'s Warnings`,
                             ...listSliced,
                         ].join("\n")));
 
@@ -387,7 +387,7 @@ const slashCommands: SlashCommandData[] = [
                     const c = new discord.ContainerBuilder()
                         .setAccentColor(ACTION_COLORS.MUTE)
                         .addTextDisplayComponents(td => td.setContent([
-                            `# ${ACTIONS_EMOJIS.MUTE} <@${user.id}>'s Warnings`,
+                            `# ${ACTION_EMOJIS.MUTE} <@${user.id}>'s Warnings`,
                             ...listSliced,
                         ].join("\n")));
 
@@ -409,7 +409,7 @@ const slashCommands: SlashCommandData[] = [
                     const c = new discord.ContainerBuilder()
                         .setAccentColor(ACTION_COLORS.KICK)
                         .addTextDisplayComponents(td => td.setContent([
-                            `# ${ACTIONS_EMOJIS.KICK} <@${user.id}>'s Warnings`,
+                            `# ${ACTION_EMOJIS.KICK} <@${user.id}>'s Warnings`,
                             ...listSliced,
                         ].join("\n")));
 
@@ -431,7 +431,7 @@ const slashCommands: SlashCommandData[] = [
                     const c = new discord.ContainerBuilder()
                         .setAccentColor(ACTION_COLORS.BAN)
                         .addTextDisplayComponents(td => td.setContent([
-                            `# ${ACTIONS_EMOJIS.BAN} <@${user.id}>'s Warnings`,
+                            `# ${ACTION_EMOJIS.BAN} <@${user.id}>'s Warnings`,
                             ...listSliced,
                         ].join("\n")));
 
