@@ -22,35 +22,9 @@ client.once(discord.Events.ClientReady, async (rCLient) => {
 });
 
 client.on(discord.Events.MessageCreate, async (message) => {
-    if (message.author.bot || !message.inGuild() || !message.member) return;
+    if (message.content.startsWith("~sync")) {
+        if (message.author.bot || !message.inGuild() || !message.member) return;
 
-    if (message.content.startsWith("~purge")) {
-        const perms = discord.PermissionFlagsBits.ManageMessages;
-
-        if (!message.member.permissionsIn(message.channel).has(perms)) {
-            await message.reply("You don't have the permissions to run this command here.");
-            return;
-        }
-
-        if (!message.guild.members.me?.permissionsIn(message.channel).has(perms)) {
-            await message.reply("I don't have permission to manage messages in this channel.");
-            return;
-        }
-
-        const arg = message.content.split(" ")[1];
-        const amount = Number(arg);
-
-        if (!arg || !Number.isInteger(amount) || amount < 1 || amount > 100) {
-            await message.reply("Please provide a valid number between 1 and 100. Example: `~purge 15`.");
-            return;
-        }
-
-        await message.delete().catch(() => { });
-        const deleted = await message.channel.bulkDelete(amount, true);
-
-        const notice = await message.channel.send(`Successfully deleted ${deleted.size} message(s).`);
-        setTimeout(() => notice.delete().catch(() => { }), 5000);
-    } else if (message.content.startsWith("~sync")) {
         if (!message.member.permissionsIn(message.channel).has(discord.PermissionFlagsBits.Administrator)) {
             await message.reply("You don't have the permissions to run this command here.");
             return;
@@ -71,6 +45,13 @@ client.on(discord.Events.MessageCreate, async (message) => {
         } catch (error) {
             await reply.edit({ content: "An error ocurred." })
             console.error(error);
+        }
+    } else if (message.content.startsWith("~")) {
+        const name = message.content.slice(1).split(" ")[0];
+        const cmd = client.textCommands.find(c => c.name === name);
+
+        if (cmd) {
+            await cmd.execute(message);
         }
     }
 });

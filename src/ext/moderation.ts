@@ -428,15 +428,38 @@ const slashCommands: SlashCommandData[] = [
 ];
 
 const textCommands: TextCommandData[] = [
+    {
+        name: "purge",
+        async execute(message) {
+            if (message.author.bot || !message.inGuild() || !message.member) return;
 
-        await interaction.reply({
-            components: [container],
-            flags: respondEph
-                ? [discord.MessageFlags.IsComponentsV2, discord.MessageFlags.Ephemeral]
-                : [discord.MessageFlags.IsComponentsV2],
-        });
+            const perms = discord.PermissionFlagsBits.ManageMessages;
+
+            if (!message.member.permissionsIn(message.channel).has(perms)) {
+                await message.reply("You don't have the permissions to run this command here.");
+                return;
+            }
+
+            if (!message.guild.members.me?.permissionsIn(message.channel).has(perms)) {
+                await message.reply("I don't have permission to manage messages in this channel.");
+                return;
+            }
+
+            const arg = message.content.split(" ")[1];
+            const amount = Number(arg);
+
+            if (!arg || !Number.isInteger(amount) || amount < 1 || amount > 100) {
+                await message.reply("Please provide a valid number between 1 and 100. Example: `~purge 15`.");
+                return;
+            }
+
+            await message.delete().catch(() => { });
+            const deleted = await message.channel.bulkDelete(amount, true);
+
+            const notice = await message.channel.send(`Successfully deleted ${deleted.size} message(s).`);
+            setTimeout(() => notice.delete().catch(() => { }), 5000);
+        }
     }
-}
 ];
 
 const constantButtons: ConstantButtonData[] = [];
