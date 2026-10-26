@@ -6,13 +6,19 @@ import { setup as moderationSetup } from "./ext/moderation";
 
 const client = new Client();
 
-client.once(discord.Events.ClientReady, (rCLient) => {
+client.once(discord.Events.ClientReady, async (rCLient) => {
     console.log(`Logged in as ${rCLient.user.displayName}`);
 
     const c = rCLient as Client<true>;
 
-    schedulesSetup(c);
-    moderationSetup(c);
+    await schedulesSetup(c);
+    await moderationSetup(c);
+
+    c.user.setActivity({
+        name: "hellow there!",
+        type: discord.ActivityType.Custom,
+        state: `Keeping up with the BBC`
+    });
 });
 
 client.on(discord.Events.MessageCreate, async (message) => {
