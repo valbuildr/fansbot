@@ -23,6 +23,19 @@ export default class Client<Ready extends boolean = boolean> extends discord.Cli
     public constantButtons = new discord.Collection<string, ConstantButtonData>();
     public db = drizzle(process.env.DATABASE_URL!);
 
+    public addSlashCommand(data: SlashCommandData) {
+        this.slashCommands.set(data.data.name, data);
+        return;
+    }
+    public addTextCommand(data: TextCommandData) {
+        this.textCommands.set(data.name, data);
+        return;
+    }
+    public addConstantButton(data: ConstantButtonData) {
+        this.constantButtons.set(data.name, data);
+        return;
+    }
+
     public async getEmoji(name: string) {
         if (!this.application) return;
         try {
