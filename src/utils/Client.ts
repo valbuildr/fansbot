@@ -12,6 +12,7 @@ export interface TextCommandData {
 }
 
 export interface ConstantButtonData {
+    name: string;
     data: discord.ButtonBuilder;
     execute: (interaction: discord.ButtonBuilder) => Promise<void>;
 }
